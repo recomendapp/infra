@@ -121,4 +121,6 @@ kubectl -n argocd rollout status deploy/argocd-server --timeout=120s
 # Apply cluster configuration
 # -------------------------------------------------------------------------------
 echo "Bootstrapping ArgoCD with cluster configuration..."
-kubectl apply -f ../cluster/root.yaml
+kubectl apply -f ../cluster/root-cluster.yaml
+echo "Applying root applications..."
+kubectl apply -f ../apps/root-apps.yaml
