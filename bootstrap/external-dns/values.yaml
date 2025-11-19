@@ -10,7 +10,12 @@ env:
 
 sources:
   - ingress
-  - service
+
+extraArgs:
+  - --cloudflare-proxied
+  - --managed-record-types=A
+  - --exclude-target-net=10.0.0.0/8
+  - --exclude-target-net=fd00::/8
 
 policy: sync
 registry: txt
