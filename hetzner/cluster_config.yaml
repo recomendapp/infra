@@ -1,0 +1,190 @@
+---
+hetzner_token: ${HCLOUD_TOKEN}
+cluster_name: recomend
+kubeconfig_path: "./kubeconfig"
+k3s_version: v1.30.3+k3s1
+
+networking:
+  ssh:
+    port: 22
+    use_agent: false # set to true if your key has a passphrase
+    public_key_path: "~/.ssh/id_ed25519.pub"
+    private_key_path: "~/.ssh/id_ed25519"
+  allowed_networks:
+    ssh:
+      - 0.0.0.0/0
+    api: # this will firewall port 6443 on the nodes
+      - 0.0.0.0/0
+    # OPTIONAL: define extra inbound/outbound firewall rules.
+    # Each entry supports the following keys:
+    #   description (string, optional)
+    #   direction   (in | out, default: in)
+    #   protocol    (tcp | udp | icmp | esp | gre, default: tcp)
+    #   port        (single port "80", port range "30000-32767", or "any") – only relevant for tcp/udp
+    #   source_ips  (array of CIDR blocks) – required when direction is in
+    #   destination_ips (array of CIDR blocks) – required when direction is out
+    #
+    # IMPORTANT: Outbound traffic is allowed by default (implicit allow-all).
+    # If you add **any** outbound rule (direction: out), Hetzner Cloud switches
+    # the outbound chain to an implicit **deny-all**; only traffic matching your
+    # outbound rules will be permitted. Define outbound rules carefully to avoid
+    # accidentally blocking required egress (DNS, updates, etc.).
+    # NOTE: Hetzner Cloud Firewalls support **max 50 entries per firewall**. The built-
+    # in rules (SSH, ICMP, node-port ranges, etc.) use ~10 slots. If the sum of the
+    # default rules plus your custom ones exceeds 50, hetzner-k3s will abort with
+    # an error.
+    # custom_firewall_rules:
+    #   - description: "Allow HTTP from any IPv4"
+    #     direction: in
+    #     protocol: tcp
+    #     port: 80
+    #     source_ips:
+    #       - 0.0.0.0/0
+    #   - description: "UDP game servers (outbound)"
+    #     direction: out
+    #     protocol: udp
+    #     port: 60000-60100
+    #     destination_ips:
+    #       - 203.0.113.0/24
+  public_network:
+    ipv4: true
+    ipv6: true
+    # hetzner_ips_query_server_url: https://.. # for large clusters, see https://github.com/vitobotta/hetzner-k3s/blob/main/docs/Recommendations.md
+    # use_local_firewall: false # for large clusters, see https://github.com/vitobotta/hetzner-k3s/blob/main/docs/Recommendations.md
+  private_network:
+    enabled: true
+    subnet: 10.0.0.0/16
+    existing_network_name: ""
+  cni:
+    enabled: true
+    encryption: false
+    mode: flannel
+    cilium:
+      # Optional: specify a path to a custom values file for Cilium Helm chart
+      # When specified, this file will be used instead of the default values
+      # helm_values_path: "./cilium-values.yaml"
+      # chart_version: "v1.17.2"
+
+  # cluster_cidr: 10.244.0.0/16 # optional: a custom IPv4/IPv6 network CIDR to use for pod IPs
+  # service_cidr: 10.43.0.0/16 # optional: a custom IPv4/IPv6 network CIDR to use for service IPs. Warning, if you change this, you should also change cluster_dns!
+  # cluster_dns: 10.43.0.10 # optional: IPv4 Cluster IP for coredns service. Needs to be an address from the service_cidr range
+
+
+# manifests:
+#   cloud_controller_manager_manifest_url: "https://github.com/hetznercloud/hcloud-cloud-controller-manager/releases/download/v1.23.0/ccm-networks.yaml"
+#   csi_driver_manifest_url: "https://raw.githubusercontent.com/hetznercloud/csi-driver/v2.12.0/deploy/kubernetes/hcloud-csi.yml"
+#   system_upgrade_controller_deployment_manifest_url: "https://github.com/rancher/system-upgrade-controller/releases/download/v0.14.2/system-upgrade-controller.yaml"
+#   system_upgrade_controller_crd_manifest_url: "https://github.com/rancher/system-upgrade-controller/releases/download/v0.14.2/crd.yaml"
+#   cluster_autoscaler_manifest_url: "https://raw.githubusercontent.com/kubernetes/autoscaler/master/cluster-autoscaler/cloudprovider/hetzner/examples/cluster-autoscaler-run-on-master.yaml"
+#   cluster_autoscaler_container_image_tag: "v1.32.0"
+
+datastore:
+  mode: etcd # etcd (default) or external
+  # external_datastore_endpoint: postgres://....
+#  etcd:
+#    # etcd snapshot configuration (optional)
+#    snapshot_retention: 24
+#    snapshot_schedule_cron: "0 * * * *"
+#
+#    # S3 snapshot configuration (optional)
+#    s3_enabled: false
+#    s3_endpoint: "" # Can also be set with ETCD_S3_ENDPOINT environment variable
+#    s3_region: "" # Can also be set with ETCD_S3_REGION environment variable
+#    s3_bucket: "" # Can also be set with ETCD_S3_BUCKET environment variable
+#    s3_access_key: "" # Can also be set with ETCD_S3_ACCESS_KEY environment variable
+#    s3_secret_key: "" # Can also be set with ETCD_S3_SECRET_KEY environment variable
+#    s3_folder: ""
+#    s3_force_path_style: false
+
+schedule_workloads_on_masters: false
+
+# image: rocky-9 # optional: default is ubuntu-24.04
+# autoscaling_image: 103908130 # optional, defaults to the `image` setting
+# snapshot_os: microos # optional: specified the os type when using a custom snapshot
+
+masters_pool:
+  instance_type: cx23
+  instance_count: 1 # for HA; you can also create a single master cluster for dev and testing (not recommended for production)
+  locations: # You can choose a single location for single master clusters or if you prefer to have all masters in the same location. For regional clusters (which are only available in the eu-central network zone), each master needs to be placed in a separate location.
+    - nbg1
+
+worker_node_pools:
+- name: small-static
+  instance_type: cx23
+  instance_count: 1
+  location: nbg1
+  # image: debian-11
+  # labels:
+  #   - key: purpose
+  #     value: blah
+  # taints:
+  #   - key: something
+  #     value: value1:NoSchedule
+- name: medium-autoscaled
+  instance_type: cx33
+  location: nbg1
+  autoscaling:
+    enabled: true
+    min_instances: 0
+    max_instances: 3
+
+# cluster_autoscaler:
+#   scan_interval: "10s"                        # How often cluster is reevaluated for scale up or down
+#   scale_down_delay_after_add: "10m"           # How long after scale up that scale down evaluation resumes
+#   scale_down_delay_after_delete: "10s"        # How long after node deletion that scale down evaluation resumes
+#   scale_down_delay_after_failure: "3m"        # How long after scale down failure that scale down evaluation resumes
+#   max_node_provision_time: "15m"              # Maximum time CA waits for node to be provisioned
+
+embedded_registry_mirror:
+  enabled: false # Enables fast p2p distribution of container images between nodes for faster pod startup. Check if your k3s version is compatible before enabling this option. You can find more information at https://docs.k3s.io/installation/registry-mirror
+
+addons:
+  csi_driver:
+    enabled: true   # Hetzner CSI driver (default true). Set to false to skip installation.
+  traefik:
+    enabled: true  # built-in Traefik ingress controller. Disabled by default.
+#   servicelb:
+#     enabled: false  # built-in ServiceLB. Disabled by default.
+#   metrics_server:
+#     enabled: false  # Kubernetes metrics-server addon. Disabled by default.
+  cloud_controller_manager:
+    enabled: true   # Hetzner Cloud Controller Manager (default true). Disabling stops automatic LB provisioning for Service objects.
+  cluster_autoscaler:
+    enabled: true   # Cluster Autoscaler addon (default true). Set to false to omit autoscaling.
+
+protect_against_deletion: false
+
+create_load_balancer_for_the_kubernetes_api: true # Just a heads up: right now, we can’t limit access to the load balancer by IP through the firewall. This feature hasn’t been added by Hetzner yet.
+
+k3s_upgrade_concurrency: 1 # how many nodes to upgrade at the same time
+
+# additional_packages:
+# - somepackage
+
+# additional_pre_k3s_commands:
+# - apt update
+# - apt upgrade -y
+
+# additional_post_k3s_commands:
+# - apt autoremove -y
+# For more advanced usage like resizing the root partition for use with Rook Ceph, see [Resizing root partition with additional post k3s commands](./Resizing_root_partition_with_post_create_commands.md)
+
+# kube_api_server_args:
+# - arg1
+# - ...
+# kube_scheduler_args:
+# - arg1
+# - ...
+# kube_controller_manager_args:
+# - arg1
+# - ...
+# kube_cloud_controller_manager_args:
+# - arg1
+# - ...
+# kubelet_args:
+# - arg1
+# - ...
+# kube_proxy_args:
+# - arg1
+# - ...
+# api_server_hostname: k8s.example.com # optional: DNS for the k8s API LoadBalancer. After the script has run, create a DNS record with the address of the API LoadBalancer.

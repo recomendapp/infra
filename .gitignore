@@ -1,0 +1,6 @@
+kubeconfig*
+.tmp/
+
+# env files
+.env
+.env*.local
