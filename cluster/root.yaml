@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/recomend/infra.git
+    repoURL: https://github.com/recomendapp/infra.git
     targetRevision: main
     path: cluster
     directory:
