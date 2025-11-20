@@ -9,6 +9,8 @@ spec:
     repoURL: https://github.com/recomendapp/infra.git
     targetRevision: main
     path: apps/martin
+    directory:
+      exclude: '{app.yaml,image-updater.yaml}'
   destination:
     server: https://kubernetes.default.svc
     namespace: default
