@@ -6,10 +6,10 @@ metadata:
 spec:
   namespace: argocd
   applicationRefs:
-    - namePattern: "apps-root"
+    - namePattern: "martin"
       images:
-        - alias: "martin"
-          imageName: "ghcr.io/recomendapp/martin:latest"
+        - alias: martin
+          imageName: ghcr.io/recomendapp/martin:latest
           updatePolicy:
-            strategy: "digest"
+            strategy: digest
   checkInterval: 2m

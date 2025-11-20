@@ -9,6 +9,9 @@ spec:
     repoURL: https://github.com/recomendapp/infra.git
     targetRevision: main
     path: apps
+    directory:
+      recurse: true
+      include: '{*/app.yaml,*/image-updater.yaml}'
   destination:
     server: https://kubernetes.default.svc
     namespace: default
@@ -18,4 +21,3 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-    
