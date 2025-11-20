@@ -120,6 +120,15 @@ wait_for_crd "appprojects.argoproj.io"
 echo "Waiting for ArgoCD server to be ready..."
 kubectl -n argocd rollout status deploy/argocd-server --timeout=120s
 
+# ------------------------------------------------------------------------------
+# ArgoCD Image Updater
+# ------------------------------------------------------------------------------
+echo "Installing ArgoCD Image Updater..."
+kubectl apply -f https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/stable/config/install.yaml
+
+echo "Waiting for ArgoCD Image Updater to be ready..."
+kubectl -n argocd-image-updater-system rollout status deploy/argocd-image-updater-controller --timeout=120s
+
 # -------------------------------------------------------------------------------
 # Apply cluster configuration
 # -------------------------------------------------------------------------------
