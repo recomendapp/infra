@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: martin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: martin
+  template:
+    metadata:
+      labels:
+        app: martin
+    spec:
+      containers:
+        - name: martin
+          image: ghcr.io/recomendapp/martin:latest
+          imagePullPolicy: Always
+          args: ["--config", "/config.yaml"]
+          ports:
+            - containerPort: 3000
