@@ -4,9 +4,9 @@ metadata:
   name: hello-world
   namespace: default
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
     cert-manager.io/cluster-issuer: letsencrypt-production
 spec:
+  ingressClassName: traefik
   tls:
     - hosts:
         - hello.recomend.app
