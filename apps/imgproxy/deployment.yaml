@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: imgproxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: imgproxy
+  template:
+    metadata:
+      labels:
+        app: imgproxy
+    spec:
+      containers:
+        - name: imgproxy
+          image: darthsim/imgproxy:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: imgproxy-secret
+          env:
+            - name: IMGPROXY_BIND
+              value: ":8080"
+            - name: IMGPROXY_BASE_URL
+              value: "https://imgproxy.recomend.app"
