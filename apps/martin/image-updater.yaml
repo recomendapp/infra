@@ -4,13 +4,14 @@ metadata:
   name: martin
   namespace: argocd
 spec:
-  applicationName: apps-root
+  namespace: argocd
+  applicationRefs:
+    - name: apps-root
 
-  # L'image à suivre
   images:
-    - name: martin
-      image: ghcr.io/recomendapp/martin:latest
-      updateStrategy: digest
+    - image: ghcr.io/recomendapp/martin
+      pattern: latest
+      updatePolicy:
+        strategy: digest
 
-  # Fréquence de re-check
   checkInterval: 2m
