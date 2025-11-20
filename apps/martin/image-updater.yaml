@@ -1,0 +1,16 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: martin
+  namespace: argocd
+spec:
+  applicationName: apps-root
+
+  # L'image à suivre
+  images:
+    - name: martin
+      image: ghcr.io/recomendapp/martin:latest
+      updateStrategy: digest
+
+  # Fréquence de re-check
+  checkInterval: 2m

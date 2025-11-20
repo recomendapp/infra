@@ -2,10 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: martin
-  annotations:
-    argocd-image-updater.argoproj.io/image-list: martin=ghcr.io/recomendapp/martin
-    argocd-image-updater.argoproj.io/martin.update-strategy: digest
-    argocd-image-updater.argoproj.io/martin.allow-tags: regexp:^latest$
 spec:
   replicas: 1
   selector:
