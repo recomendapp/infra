@@ -85,6 +85,9 @@ kubectl apply -f infisical/secretstore.yaml
 # external-dns
 # ------------------------------------------------------------------------------
 
+echo "Creating namespace external-dns..."
+kubectl create namespace external-dns --dry-run=client -o yaml | kubectl apply -f -
+
 echo "Applying Cloudflare ExternalSecret..."
 kubectl apply -f external-dns/secret.yaml
 
