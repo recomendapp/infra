@@ -1,14 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: apps-root
+  name: imgproxy
   namespace: argocd
 spec:
   project: default
   source:
     repoURL: https://github.com/recomendapp/infra.git
     targetRevision: main
-    path: apps
+    path: apps/imgproxy
   destination:
     server: https://kubernetes.default.svc
     namespace: default
@@ -18,4 +18,3 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-    
