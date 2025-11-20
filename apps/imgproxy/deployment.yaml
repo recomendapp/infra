@@ -19,9 +19,7 @@ spec:
             - containerPort: 8080
           envFrom:
             - secretRef:
-                name: imgproxy-secret
+              name: imgproxy-secret
           env:
-            - name: IMGPROXY_BIND
-              value: ":8080"
-            - name: IMGPROXY_BASE_URL
-              value: "https://imgproxy.recomend.app"
+            - name: IMGPROXY_ENABLE_WEBP
+              value: "true"
