@@ -19,9 +19,38 @@ spec:
           - secretRef:
               name: umami-secret
         env:
+          - name: UMAMI_DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: umami-secret
+                key: UMAMI_DB_USER
+
+          - name: UMAMI_DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: umami-secret
+                key: UMAMI_DB_PASSWORD
+
+          - name: UMAMI_DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: umami-secret
+                key: UMAMI_DB_NAME
+
+          - name: DB_HOST
+            value: umami-postgres
+
           - name: DATABASE_URL
-            value: "postgres://${UMAMI_DB_USER}:${UMAMI_DB_PASSWORD}@umami-postgres:5432/${UMAMI_DB_NAME}"
+            value: "postgres://$(UMAMI_DB_USER):$(UMAMI_DB_PASSWORD)@$(DB_HOST):5432/$(UMAMI_DB_NAME)"
+
           - name: DATABASE_TYPE
             value: "postgres"
+
+          - name: APP_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: umami-secret
+                key: APP_SECRET
+
         ports:
           - containerPort: 3000
