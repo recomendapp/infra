@@ -35,6 +35,15 @@ helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
 helm repo add argo https://argoproj.github.io/argo-helm
 helm repo update
 
+# ------------------------------------------------------------------------------
+# Reflector (pour répliquer les secrets entre namespaces)
+# ------------------------------------------------------------------------------
+echo "Installing Reflector..."
+kubectl apply -f https://github.com/emberstack/kubernetes-reflector/releases/latest/download/reflector.yaml
+
+echo "Waiting for Reflector to be ready..."
+kubectl -n kube-system rollout status deploy/reflector --timeout=120s
+
 
 # ------------------------------------------------------------------------------
 # cert-manager
@@ -121,13 +130,46 @@ echo "Waiting for ArgoCD server to be ready..."
 kubectl -n argocd rollout status deploy/argocd-server --timeout=120s
 
 # ------------------------------------------------------------------------------
+# GitHub Credentials
+# ------------------------------------------------------------------------------
+echo "Creating GitHub credentials for Docker images..."
+kubectl apply -f argocd/github-credentials.yaml
+
+echo "Waiting for GitHub image credentials to be ready..."
+if ! kubectl -n argocd wait --for=condition=Ready --timeout=60s externalsecret/github-credentials; then
+  echo "❌ ExternalSecret github-credentials FAILED to become Ready"
+  exit 1
+fi
+
+echo "✅ GitHub image credentials created and will be replicated to other namespaces"
+
+echo "Creating GitHub repository credentials for ArgoCD..."
+kubectl apply -f argocd/github-repo.yaml
+
+echo "Waiting for GitHub repo credentials to be ready..."
+if ! kubectl -n argocd wait --for=condition=Ready --timeout=60s externalsecret/github-repo; then
+  echo "❌ ExternalSecret github-repo FAILED to become Ready"
+  exit 1
+fi
+
+echo "✅ ArgoCD can now access private Git repositories"
+
+# ------------------------------------------------------------------------------
 # ArgoCD Image Updater
 # ------------------------------------------------------------------------------
 echo "Installing ArgoCD Image Updater..."
-kubectl apply -f https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/stable/config/install.yaml
+curl -s https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/stable/config/install.yaml \
+  | sed 's/namespace: argocd-image-updater-system/namespace: argocd/g' \
+  | kubectl apply -f -
+
+echo "Configuring ArgoCD Image Updater registries..."
+kubectl apply -f argocd/image-updater-config.yaml
 
 echo "Waiting for ArgoCD Image Updater to be ready..."
-kubectl -n argocd-image-updater-system rollout status deploy/argocd-image-updater-controller --timeout=120s
+kubectl -n argocd rollout status deploy/argocd-image-updater --timeout=120s
+
+echo "Restarting ArgoCD Image Updater to pick up configuration..."
+kubectl -n argocd rollout restart deploy/argocd-image-updater
 
 # -------------------------------------------------------------------------------
 # Apply cluster configuration

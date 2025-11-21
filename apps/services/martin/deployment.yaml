@@ -2,6 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: martin
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: martin=ghcr.io/recomendapp/martin
+    argocd-image-updater.argoproj.io/martin.update-strategy: latest
+    argocd-image-updater.argoproj.io/martin.force-update: "true"
+    argocd-image-updater.argoproj.io/martin.pull-secret: secret:default/github-credentials
 spec:
   replicas: 1
   selector:
@@ -12,6 +17,8 @@ spec:
       labels:
         app: martin
     spec:
+      imagePullSecrets:
+        - name: github-credentials
       containers:
         - name: martin
           image: ghcr.io/recomendapp/martin:latest
