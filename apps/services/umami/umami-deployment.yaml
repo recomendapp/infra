@@ -14,12 +14,14 @@ spec:
     spec:
       containers:
       - name: umami
-        image: ghcr.io/umami-software/umami:postgres-latest
+        image: ghcr.io/umami-software/umami:postgresql-latest
         envFrom:
           - secretRef:
               name: umami-secret
         env:
           - name: DATABASE_URL
             value: "postgres://${UMAMI_DB_USER}:${UMAMI_DB_PASSWORD}@umami-postgres:5432/${UMAMI_DB_NAME}"
+          - name: DATABASE_TYPE
+            value: "postgres"
         ports:
           - containerPort: 3000
