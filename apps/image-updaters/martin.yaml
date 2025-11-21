@@ -4,6 +4,7 @@ metadata:
   name: martin
   namespace: argocd
 spec:
+  namespace: argocd
   applicationRefs:
     - name: martin
       images:
