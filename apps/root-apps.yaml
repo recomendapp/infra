@@ -11,7 +11,7 @@ spec:
     path: apps
     directory:
       recurse: true
-      include: '{*/app.yaml,*/image-updater.yaml}'
+      exclude: 'services/**'
   destination:
     server: https://kubernetes.default.svc
     namespace: default

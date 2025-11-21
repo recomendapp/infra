@@ -8,9 +8,7 @@ spec:
   source:
     repoURL: https://github.com/recomendapp/infra.git
     targetRevision: main
-    path: apps/imgproxy
-    directory:
-      exclude: 'app.yaml'
+    path: apps/services/imgproxy
   destination:
     server: https://kubernetes.default.svc
     namespace: default
