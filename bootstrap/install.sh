@@ -166,10 +166,10 @@ echo "Configuring ArgoCD Image Updater registries..."
 kubectl apply -f argocd/image-updater-config.yaml
 
 echo "Waiting for ArgoCD Image Updater to be ready..."
-kubectl -n argocd rollout status deploy/argocd-image-updater --timeout=120s
+kubectl -n argocd rollout status deploy/argocd-image-updater-controller --timeout=120s
 
 echo "Restarting ArgoCD Image Updater to pick up configuration..."
-kubectl -n argocd rollout restart deploy/argocd-image-updater
+kubectl -n argocd rollout restart deploy/argocd-image-updater-controller
 
 # -------------------------------------------------------------------------------
 # Apply cluster configuration

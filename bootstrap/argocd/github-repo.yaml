@@ -1,13 +1,13 @@
-apiVersion: external-secrets.io/v1beta1
+apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
   name: github-repo
   namespace: argocd
 spec:
-  refreshInterval: 1h
   secretStoreRef:
-    name: infisical-secret-store
     kind: ClusterSecretStore
+    name: infisical
+
   target:
     name: github-repo
     creationPolicy: Owner
@@ -16,11 +16,16 @@ spec:
         labels:
           argocd.argoproj.io/secret-type: repository
       type: Opaque
-      stringData:
+      data:
         type: git
-        url: https://github.com/recomendapp
-        username: "{{ .GITHUB_USERNAME }}"
-        password: "{{ .GITHUB_TOKEN }}"
-  dataFrom:
-    - extract:
-        key: /
+        url: https://github.com/recomendapp/infra.git
+        username: "{{ .username }}"
+        password: "{{ .token }}"
+
+  data:
+    - secretKey: username
+      remoteRef:
+        key: GITHUB_USERNAME
+    - secretKey: token
+      remoteRef:
+        key: GITHUB_TOKEN
