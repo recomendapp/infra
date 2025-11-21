@@ -12,5 +12,3 @@ spec:
           imageName: ghcr.io/recomendapp/martin:latest
           commonUpdateSettings:
             updateStrategy: digest
-            pullSecret: "secret:argocd/github-credentials#.dockerconfigjson"
-
