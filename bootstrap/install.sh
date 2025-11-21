@@ -36,16 +36,6 @@ helm repo add argo https://argoproj.github.io/argo-helm
 helm repo update
 
 # ------------------------------------------------------------------------------
-# Reflector (pour répliquer les secrets entre namespaces)
-# ------------------------------------------------------------------------------
-echo "Installing Reflector..."
-kubectl apply -f https://github.com/emberstack/kubernetes-reflector/releases/latest/download/reflector.yaml
-
-echo "Waiting for Reflector to be ready..."
-kubectl -n kube-system rollout status deploy/reflector --timeout=120s
-
-
-# ------------------------------------------------------------------------------
 # cert-manager
 # ------------------------------------------------------------------------------
 echo "Installing cert-manager..."

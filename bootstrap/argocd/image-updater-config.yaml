@@ -9,5 +9,5 @@ data:
     - name: GitHub Container Registry
       prefix: ghcr.io
       api_url: https://ghcr.io
-      credentials: secret:argocd/github-credentials#.dockerconfigjson
-      default: true
+      credentials: secret:argocd/github-credentials#basic
+      credsexpire: 12h
