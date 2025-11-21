@@ -157,16 +157,21 @@ echo "✅ ArgoCD can now access private Git repositories"
 # ------------------------------------------------------------------------------
 # ArgoCD Image Updater
 # ------------------------------------------------------------------------------
-echo "Installing ArgoCD Image Updater..."
-curl -s https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/stable/config/install.yaml \
-  | sed 's/namespace: argocd-image-updater-system/namespace: argocd/g' \
-  | kubectl apply -f -
+echo "Checking if ArgoCD Image Updater is already installed..."
+if kubectl -n argocd get deploy argocd-image-updater-controller >/dev/null 2>&1; then
+  echo "ArgoCD Image Updater already installed. Skipping installation."
+else
+  echo "Installing ArgoCD Image Updater..."
+  curl -s https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/stable/config/install.yaml \
+    | sed 's/namespace: argocd-image-updater-system/namespace: argocd/g' \
+    | kubectl apply -f -
+
+  echo "Waiting for ArgoCD Image Updater to be ready..."
+  kubectl -n argocd rollout status deploy/argocd-image-updater-controller --timeout=120s
+fi
 
 echo "Configuring ArgoCD Image Updater registries..."
 kubectl apply -f argocd/image-updater-config.yaml
-
-echo "Waiting for ArgoCD Image Updater to be ready..."
-kubectl -n argocd rollout status deploy/argocd-image-updater-controller --timeout=120s
 
 echo "Restarting ArgoCD Image Updater to pick up configuration..."
 kubectl -n argocd rollout restart deploy/argocd-image-updater-controller

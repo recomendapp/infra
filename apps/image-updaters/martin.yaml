@@ -1,0 +1,16 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: martin
+  namespace: argocd
+spec:
+  applicationRefs:
+    - name: martin
+      images:
+        - alias: martin
+          imageName: ghcr.io/recomendapp/martin:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+            pullSecret:
+              name: github-credentials
+              namespace: default
