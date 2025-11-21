@@ -1,0 +1,9 @@
+resources:
+- postgres-deployment.yaml
+- postgres-pvc.yaml
+- postgres-secret.yaml
+- postgres-service.yaml
+- umami-deployment.yaml
+- umami-ingress.yaml
+- umami-secret.yaml
+- umami-service.yaml

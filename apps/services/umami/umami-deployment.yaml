@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: umami
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: umami
+  template:
+    metadata:
+      labels:
+        app: umami
+    spec:
+      containers:
+      - name: umami
+        image: ghcr.io/umami-software/umami:postgres-latest
+        envFrom:
+          - secretRef:
+              name: umami-secret
+        env:
+          - name: DATABASE_URL
+            value: "postgres://${UMAMI_DB_USER}:${UMAMI_DB_PASSWORD}@umami-postgres:5432/${UMAMI_DB_NAME}"
+        ports:
+          - containerPort: 3000

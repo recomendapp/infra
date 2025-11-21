@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: umami-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: umami-postgres
+  template:
+    metadata:
+      labels:
+        app: umami-postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15
+        envFrom:
+          - secretRef:
+              name: umami-postgres-secret
+        ports:
+          - containerPort: 5432
+        volumeMounts:
+          - name: data
+            mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: umami-postgres-data
