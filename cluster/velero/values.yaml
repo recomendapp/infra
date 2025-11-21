@@ -1,3 +1,5 @@
+upgradeCRDs: true
+
 configuration:
   backupStorageLocation:
     - name: default
