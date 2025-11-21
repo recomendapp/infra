@@ -1,0 +1,92 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: velero-config-patch
+  namespace: velero
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  ttlSecondsAfterFinished: 100
+  template:
+    spec:
+      serviceAccountName: velero-config-patcher
+      restartPolicy: OnFailure
+      containers:
+      - name: patch-config
+        image: bitnami/kubectl:latest
+        command:
+        - /bin/sh
+        - -c
+        - |
+          set -e
+          
+          # Attendre que les secrets soient disponibles
+          echo "Attente des secrets..."
+          until kubectl get secret cloud-credentials -n velero > /dev/null 2>&1; do
+            echo "En attente du secret cloud-credentials..."
+            sleep 5
+          done
+          
+          until kubectl get secret velero-r2-config -n velero > /dev/null 2>&1; do
+            echo "En attente du secret velero-r2-config..."
+            sleep 5
+          done
+          
+          # Récupérer les valeurs depuis les secrets
+          BUCKET=$(kubectl get secret velero-r2-config -n velero -o jsonpath='{.data.VELERO_R2_BUCKET}' | base64 -d)
+          ACCOUNT_ID=$(kubectl get secret velero-r2-config -n velero -o jsonpath='{.data.VELERO_R2_ACCOUNT_ID}' | base64 -d)
+          S3_URL="https://${ACCOUNT_ID}.r2.cloudflarestorage.com"
+          
+          echo "Configuration Velero avec:"
+          echo "  Bucket: $BUCKET"
+          echo "  S3 URL: $S3_URL"
+          
+          # Patcher le BackupStorageLocation
+          kubectl patch backupstoragelocation default -n velero --type merge -p "{
+            \"spec\": {
+              \"objectStorage\": {
+                \"bucket\": \"$BUCKET\"
+              },
+              \"config\": {
+                \"region\": \"auto\",
+                \"s3ForcePathStyle\": \"true\",
+                \"s3Url\": \"$S3_URL\"
+              }
+            }
+          }"
+          
+          echo "Configuration Velero mise à jour avec succès"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: velero-config-patcher
+  namespace: velero
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: velero-config-patcher
+  namespace: velero
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list"]
+- apiGroups: ["velero.io"]
+  resources: ["backupstoragelocations"]
+  verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: velero-config-patcher
+  namespace: velero
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: velero-config-patcher
+subjects:
+- kind: ServiceAccount
+  name: velero-config-patcher
+  namespace: velero
