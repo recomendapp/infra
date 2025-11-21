@@ -6,12 +6,10 @@ metadata:
 spec:
   namespace: argocd
   applicationRefs:
-    - name: martin
+    - namePattern: martin
       images:
         - alias: martin
           imageName: ghcr.io/recomendapp/martin:latest
           commonUpdateSettings:
             updateStrategy: digest
-            pullSecret:
-              name: github-credentials
-              namespace: default
+            pullSecret: "secret:default/github-credentials"
