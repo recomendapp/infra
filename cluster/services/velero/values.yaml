@@ -23,8 +23,6 @@ configuration:
 credentials:
   useSecret: true
   existingSecret: velero-credentials
-  secretContents:
-    cloud: ""
 
 extraPlugins:
   - name: velero-plugin-for-aws
