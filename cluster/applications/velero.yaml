@@ -11,6 +11,8 @@ spec:
     repoURL: https://github.com/recomendapp/infra.git
     targetRevision: main
     path: cluster/services/velero
+    kustomize:
+      enableHelm: true
   destination:
     server: https://kubernetes.default.svc
     namespace: velero
