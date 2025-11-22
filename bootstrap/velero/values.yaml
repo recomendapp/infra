@@ -1,0 +1,37 @@
+configuration:
+  backupStorageLocation:
+    - name: default
+      provider: aws
+      bucket: $(VELERO_R2_BUCKET)
+      config:
+        region: auto
+        s3ForcePathStyle: "true"
+        s3Url: https://$(VELERO_R2_ACCOUNT_ID).r2.cloudflarestorage.com
+  volumeSnapshotLocation:
+    - name: default
+      provider: aws
+      config:
+        region: auto
+
+credentials:
+  useSecret: true
+  existingSecret: velero-credentials
+
+initContainers:
+  - name: velero-plugin-for-aws
+    image: velero/velero-plugin-for-aws:v1.10.0
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+
+schedules:
+  daily:
+    disabled: false
+    schedule: "0 2 * * *"
+    useOwnerReferencesInBackup: false
+    template:
+      ttl: "720h"
+      includedNamespaces:
+        - "*"
+      excludedNamespaces:
+        - velero

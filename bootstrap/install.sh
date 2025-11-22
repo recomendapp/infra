@@ -33,6 +33,7 @@ helm repo add jetstack https://charts.jetstack.io
 helm repo add external-secrets https://charts.external-secrets.io
 helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
 helm repo add argo https://argoproj.github.io/argo-helm
+helm repo add vmware-tanzu https://vmware-tanzu.github.io/helm-charts
 helm repo update
 
 # ------------------------------------------------------------------------------
@@ -165,6 +166,34 @@ kubectl apply -f argocd/image-updater-config.yaml
 
 echo "Restarting ArgoCD Image Updater to pick up configuration..."
 kubectl -n argocd rollout restart deploy/argocd-image-updater-controller
+
+# ------------------------------------------------------------------------------
+# Velero
+# ------------------------------------------------------------------------------
+echo "Creating namespace velero..."
+kubectl create namespace velero --dry-run=client -o yaml | kubectl apply -f -
+
+echo "Applying Velero ExternalSecret..."
+kubectl apply -f ../cluster/velero/secret.yaml
+
+echo "Waiting for velero credentials to be created..."
+if ! kubectl -n velero wait --for=condition=Ready --timeout=60s externalsecret/velero-credentials; then
+  echo "❌ ExternalSecret velero-credentials FAILED to become Ready"
+  exit 1
+fi
+
+echo "Verifying Velero secret was created..."
+kubectl -n velero get secret velero-credentials
+
+echo "Installing Velero..."
+helm upgrade --install velero vmware-tanzu/velero \
+  --namespace velero \
+  --values velero/values.yaml \
+  --set-string configuration.backupStorageLocation[0].bucket="$(kubectl -n velero get secret velero-credentials -o jsonpath='{.data.VELERO_R2_BUCKET}' | base64 -d)" \
+  --set-string configuration.backupStorageLocation[0].config.s3Url="https://$(kubectl -n velero get secret velero-credentials -o jsonpath='{.data.VELERO_R2_ACCOUNT_ID}' | base64 -d).r2.cloudflarestorage.com"
+
+echo "Waiting for Velero to be ready..."
+kubectl -n velero rollout status deploy/velero --timeout=120s
 
 # -------------------------------------------------------------------------------
 # Apply cluster configuration

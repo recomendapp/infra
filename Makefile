@@ -38,6 +38,11 @@ help:
 	@echo "  make argocd-ui            Access ArgoCD UI (port-forward)"
 	@echo "  make argocd-password      Show ArgoCD admin password"
 	@echo ""
+	@echo "💾 Backup (Velero):"
+	@echo "  make backup-create        Create a manual backup"
+	@echo "  make backup-list          List all backups"
+	@echo "  make backup-status        Check Velero status"
+	@echo ""
 	@echo "════════════════════════════════════════════════════════════════════"
 
 # ============================================================================
@@ -124,5 +129,28 @@ argocd-ui:
 	@echo ""
 	@kubectl port-forward svc/argocd-server -n argocd 8080:443
 
+
+# ============================================================================
+# Velero Backup Commands
+# ============================================================================
+
+.PHONY: backup-create
+backup-create:
+	@echo "💾 Creating manual backup..."
+	@velero backup create manual-backup-$$(date +%Y%m%d-%H%M%S)
+	@echo "✅ Backup created"
+
+.PHONY: backup-list
+backup-list:
+	@echo "📋 Listing backups..."
+	@velero backup get
+
+.PHONY: backup-status
+backup-status:
+	@echo "🔍 Velero status..."
+	@kubectl -n velero get pods
+	@echo ""
+	@echo "📍 Backup locations:"
+	@velero backup-location get
 
 .DEFAULT_GOAL := help
