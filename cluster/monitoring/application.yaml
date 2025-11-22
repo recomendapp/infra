@@ -13,6 +13,8 @@ spec:
       valuesObject:
         grafana:
           enabled: true
+        prometheus-node-exporter:
+          hostPort: 19100
         prometheus:
           prometheusSpec:
             storageSpec:
