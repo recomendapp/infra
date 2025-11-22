@@ -1,7 +1,6 @@
 installCRDs: true
 
-nodeAgent:
-  enabled: true
+deployNodeAgent: true
 
 configuration:
   backupStorageLocation:
