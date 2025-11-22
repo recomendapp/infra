@@ -168,10 +168,18 @@ backup-restore:
 		echo "❌ Cancelled"; exit 1; \
 	fi; \
 	echo ""; \
+	echo "⏳ Checking Velero availability..."; \
+	if ! kubectl -n velero get deploy/velero >/dev/null 2>&1; then \
+		echo "❌ Velero deployment not found or cluster unreachable"; exit 1; \
+	fi; \
 	echo "⏳ Waiting for Velero pod to be ready..."; \
-	kubectl -n velero rollout status deploy/velero --timeout=120s >/dev/null; \
+	if ! kubectl -n velero rollout status deploy/velero --timeout=60s >/dev/null 2>&1; then \
+		echo "❌ Velero is not ready — aborting restore"; exit 1; \
+	fi; \
 	echo "🚀 Launching restore: $$BACKUP"; \
-	velero restore create --from-backup "$$BACKUP"; \
+	if ! velero restore create --from-backup "$$BACKUP"; then \
+		echo "❌ Restore failed to launch"; exit 1; \
+	fi; \
 	echo "✅ Restore launched."
 
 .DEFAULT_GOAL := help
