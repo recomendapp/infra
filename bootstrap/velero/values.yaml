@@ -2,11 +2,12 @@ configuration:
   backupStorageLocation:
     - name: default
       provider: aws
-      bucket: $(VELERO_R2_BUCKET)
+      bucket: ""
       config:
         region: auto
         s3ForcePathStyle: "true"
-        s3Url: https://$(VELERO_R2_ACCOUNT_ID).r2.cloudflarestorage.com
+        s3Url: ""
+
   volumeSnapshotLocation:
     - name: default
       provider: aws
@@ -16,6 +17,8 @@ configuration:
 credentials:
   useSecret: true
   existingSecret: velero-credentials
+  secretContents:
+    cloud: ""
 
 initContainers:
   - name: velero-plugin-for-aws

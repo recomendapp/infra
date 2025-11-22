@@ -153,4 +153,18 @@ backup-status:
 	@echo "📍 Backup locations:"
 	@velero backup-location get
 
+.PHONY: backup-restore-latest
+backup-restore-latest:
+	@echo "🔄 Searching for latest Velero backup..."
+	@LATEST=$$(velero backup get -o json | jq -r 'sort_by(.status.startTimestamp) | last | .metadata.name'); \
+	if [ -z "$$LATEST" ] || [ "$$LATEST" = "null" ]; then \
+		echo "❌ No backup found"; exit 1; \
+	fi; \
+	echo "📦 Latest backup: $$LATEST"; \
+	echo "⏳ Waiting for Velero to be ready..."; \
+	kubectl -n velero rollout status deploy/velero --timeout=120s >/dev/null; \
+	echo "🚀 Restoring backup $$LATEST..."; \
+	velero restore create --from-backup "$$LATEST"; \
+	echo "✅ Restore launched."
+
 .DEFAULT_GOAL := help
