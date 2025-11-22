@@ -1,10 +1,11 @@
+SHELL := /usr/bin/env bash
+
 # ============================================================================
 # K3s Cluster Management - Pure GitOps
 # ============================================================================
 
 CLUSTER_CONFIG     = hetzner/cluster_config.yaml
 CLUSTER_CONFIG_GEN = hetzner/cluster_config.generated.yaml
-
 
 # ============================================================================
 # ENV
@@ -28,20 +29,31 @@ help:
 	@echo "════════════════════════════════════════════════════════════════════"
 	@echo ""
 	@echo "🏗️  Cluster Management:"
-	@echo "  make cluster-create       Create cluster + bootstrap"
-	@echo "  make cluster-delete       Delete the cluster"
+	@echo "  make cluster-create		Create cluster + bootstrap"
+	@echo "  make cluster-delete		Delete the cluster"
 	@echo ""
 	@echo "⚙️  Bootstrap:"
-	@echo "  make bootstrap            Run cluster bootstrap"
+	@echo "  make bootstrap				Run cluster bootstrap"
+	@echo "  make bootstrap-minimal		Run minimal bootstrap"
+	@echo "  make bootstrap-component	COMPONENT=<name>  Bootstrap a specific component"
+	@echo ""
+	@echo "🔍 Validation:"
+	@echo "  make validate				Validate all components"
+	@echo "  make validate-component	COMPONENT=<name>  Validate a specific component"
+	@echo ""
+	@echo "🧹 Uninstall:"
+	@echo "  make uninstall				Uninstall all components"
+	@echo "  make uninstall-component	COMPONENT=<name>  Uninstall a specific component"
 	@echo ""
 	@echo "🌐 Access & UI:"
-	@echo "  make argocd-ui            Access ArgoCD UI (port-forward)"
-	@echo "  make argocd-password      Show ArgoCD admin password"
+	@echo "  make argocd-ui				Access ArgoCD UI (port-forward)"
+	@echo "  make argocd-password		Show ArgoCD admin password"
 	@echo ""
 	@echo "💾 Backup (Velero):"
-	@echo "  make backup-create        Create a manual backup"
-	@echo "  make backup-list          List all backups"
-	@echo "  make backup-status        Check Velero status"
+	@echo "  make backup-create			Create a manual backup"
+	@echo "  make backup-list			List all backups"
+	@echo "  make backup-status			Check Velero status"
+	@echo "  make backup-restore		Restore from a backup"
 	@echo ""
 	@echo "════════════════════════════════════════════════════════════════════"
 
@@ -101,9 +113,78 @@ cluster-delete: generate-cluster-config
 
 .PHONY: bootstrap
 bootstrap:
-	@echo "🚀 Running cluster bootstrap..."
-	cd bootstrap && ./install.sh
-	@echo "✅ Bootstrap completed."
+	@./scripts/profiles/full.sh
+
+.PHONY: bootstrap-minimal
+bootstrap-minimal:
+	@./scripts/profiles/minimal.sh
+
+.PHONY: bootstrap-component
+bootstrap-component:
+	@if [ -z "$(COMPONENT)" ]; then \
+		echo "❌ Usage: make bootstrap-component COMPONENT=argocd"; \
+		exit 1; \
+	fi; \
+	./scripts/components/$(COMPONENT)/install.sh
+
+# ============================================================================
+# Validation
+# ============================================================================
+
+.PHONY: validate
+validate:
+	@echo "🔍 Validating all components..."; \
+	errors=0; \
+	for component in cert-manager external-secrets argocd velero; do \
+		if [ -f "./scripts/components/$$component/validate.sh" ]; then \
+			echo ""; \
+			./scripts/components/$$component/validate.sh || ((errors++)); \
+		fi; \
+	done; \
+	echo ""; \
+	if [ $$errors -eq 0 ]; then \
+		echo "✅ All validations passed"; \
+	else \
+		echo "❌ $$errors validation(s) failed"; \
+		exit 1; \
+	fi
+
+.PHONY: validate-component
+validate-component:
+	@if [ -z "$(COMPONENT)" ]; then \
+		echo "❌ Usage: make validate-component COMPONENT=argocd"; \
+		exit 1; \
+	fi; \
+	./scripts/components/$(COMPONENT)/validate.sh
+
+# ============================================================================
+# Uninstall
+# ============================================================================
+
+.PHONY: uninstall
+uninstall:
+	@./scripts/uninstall.sh
+
+.PHONY: uninstall-component
+uninstall-component:
+	@if [ -z "$(COMPONENT)" ]; then \
+		echo "❌ Usage: make uninstall-component COMPONENT=argocd"; \
+		exit 1; \
+	fi; \
+	./scripts/components/$(COMPONENT)/uninstall.sh
+
+.PHONY: uninstall-all
+uninstall-all:
+	@echo "⚠️  This will DELETE everything from the cluster!"; \
+	read -p "Type 'DELETE' to confirm: " confirm; \
+	if [ "$$confirm" = "DELETE" ]; then \
+		for component in gitops argocd velero external-dns infisical external-secrets cert-manager; do \
+			./scripts/components/$$component/uninstall.sh 2>/dev/null || true; \
+		done; \
+		echo "✅ Full uninstall complete"; \
+	else \
+		echo "❌ Cancelled"; \
+	fi
 
 # ============================================================================
 # Access & UI
@@ -181,5 +262,21 @@ backup-restore:
 		echo "❌ Restore failed to launch"; exit 1; \
 	fi; \
 	echo "✅ Restore launched."
+
+# ============================================================================
+# Restore
+# ============================================================================
+
+.PHONY: disaster-recovery
+disaster-recovery:
+	@./scripts/restore.sh
+
+.PHONY: restore-diagnose
+restore-diagnose:
+	@if [ -z "$(RESTORE_NAME)" ]; then \
+		./scripts/restore/diagnose.sh; \
+		exit 0; \
+	fi; \
+	./scripts/restore/diagnose.sh "$(RESTORE_NAME)"
 
 .DEFAULT_GOAL := help

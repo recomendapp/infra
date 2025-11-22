@@ -6,6 +6,6 @@ metadata:
   annotations:
     load-balancer.hetzner.cloud/location: nbg1
     load-balancer.hetzner.cloud/name: traefik-lb
-    load-balancer.hetzner.cloud/use-private-ip: "false"
+    load-balancer.hetzner.cloud/use-private-ip: "true"
 spec:
   type: LoadBalancer
