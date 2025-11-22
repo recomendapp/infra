@@ -5,7 +5,6 @@ metadata:
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "40"
-    argocd.argoproj.io/kustomize-build-options: "--enable-helm"
 spec:
   project: default
   source:
