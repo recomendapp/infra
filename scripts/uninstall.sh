@@ -34,7 +34,7 @@ uninstall_gitops_apps() {
     log_section "Uninstalling all GitOps Applications"
     log_warning "This will delete all applications managed by ArgoCD based on the 'root.yaml' application."
     read -p "Are you sure? [y/N] " confirm
-    if [[ "$confirm" =~ ^[Yy]$$ ]]; then
+    if [[ "$confirm" =~ ^[Yy]$ ]]; then
         "$COMPONENTS_DIR/gitops/uninstall.sh"
     else
         log_info "Cancelled"
@@ -45,7 +45,7 @@ uninstall_argocd() {
     log_section "Uninstalling ArgoCD"
     log_warning "This will remove the ArgoCD controller. You should uninstall the GitOps applications first."
     read -p "Are you sure? [y/N] " confirm
-    if [[ "$confirm" =~ ^[Yy]$$ ]]; then
+    if [[ "$confirm" =~ ^[Yy]$ ]]; then
         if [ -f "$COMPONENTS_DIR/argocd/uninstall.sh" ]; then
             "$COMPONENTS_DIR/argocd/uninstall.sh"
         else

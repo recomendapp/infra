@@ -1,0 +1,23 @@
+provider:
+  name: cloudflare
+
+env:
+  - name: CF_API_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: cloudflare-api-token
+        key: api-token
+
+sources:
+  - ingress
+
+extraArgs:
+  - --cloudflare-proxied
+  - --managed-record-types=A
+  - --exclude-target-net=10.0.0.0/8
+  - --exclude-target-net=fd00::/8
+
+policy: sync
+registry: txt
+txtOwnerId: "k8s"
+interval: "1m"

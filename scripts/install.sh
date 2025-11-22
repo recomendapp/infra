@@ -11,29 +11,30 @@ main() {
     
     check_kubectl || exit 1
     
-    log_info "This script will install ArgoCD and then apply the root application to bootstrap the cluster."
+    log_info "This script will install foundational components (cert-manager, external-secrets, infisical, argocd)
+and then apply the root application to bootstrap the cluster."
     
-    # 1. Install ArgoCD
-    if [ -f "$COMPONENTS_DIR/argocd/install.sh" ]; then
-        "$COMPONENTS_DIR/argocd/install.sh" || {
-            log_error "Failed to install ArgoCD"
-            exit 1
-        }
-    else
-        log_error "Install script not found for ArgoCD"
-        exit 1
-    fi
+    local components=(
+        "cert-manager"
+        "external-secrets"
+        "infisical"
+        "argocd"
+        "gitops"
+    )
     
-    # 2. Install GitOps root application
-    if [ -f "$COMPONENTS_DIR/gitops/install.sh" ]; then
-        "$COMPONENTS_DIR/gitops/install.sh" || {
-            log_error "Failed to apply root GitOps application"
+    for component in "${components[@]}"; do
+        log_section "Installing Component: $component"
+        local install_script="$COMPONENTS_DIR/$component/install.sh"
+        if [ -f "$install_script" ]; then
+            "$install_script" || {
+                log_error "Failed to install $component"
+                exit 1
+            }
+        else
+            log_error "Install script not found for $component"
             exit 1
-        }
-    else
-        log_error "Install script not found for GitOps"
-        exit 1
-    fi
+        fi
+    done
     
     log_section "🎉 Bootstrap Complete!"
     echo ""
