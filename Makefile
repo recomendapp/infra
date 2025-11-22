@@ -153,18 +153,25 @@ backup-status:
 	@echo "📍 Backup locations:"
 	@velero backup-location get
 
-.PHONY: backup-restore-latest
-backup-restore-latest:
-	@echo "🔄 Searching for latest Velero backup..."
-	@LATEST=$$(velero backup get -o json | jq -r 'sort_by(.status.startTimestamp) | last | .metadata.name'); \
-	if [ -z "$$LATEST" ] || [ "$$LATEST" = "null" ]; then \
-		echo "❌ No backup found"; exit 1; \
+.PHONY: backup-restore
+backup-restore:
+	@echo "📋 Available Velero backups:"; \
+	velero backup get; \
+	echo ""; \
+	read -p "👉 Enter backup name to restore: " BACKUP; \
+	if [ -z "$$BACKUP" ]; then \
+		echo "❌ No backup selected"; exit 1; \
 	fi; \
-	echo "📦 Latest backup: $$LATEST"; \
-	echo "⏳ Waiting for Velero to be ready..."; \
+	echo ""; \
+	read -p "⚠️ This will restore '$$BACKUP'. Continue? [y/N] " CONFIRM; \
+	if ! echo "$$CONFIRM" | grep -iq "^y"; then \
+		echo "❌ Cancelled"; exit 1; \
+	fi; \
+	echo ""; \
+	echo "⏳ Waiting for Velero pod to be ready..."; \
 	kubectl -n velero rollout status deploy/velero --timeout=120s >/dev/null; \
-	echo "🚀 Restoring backup $$LATEST..."; \
-	velero restore create --from-backup "$$LATEST"; \
+	echo "🚀 Launching restore: $$BACKUP"; \
+	velero restore create --from-backup "$$BACKUP"; \
 	echo "✅ Restore launched."
 
 .DEFAULT_GOAL := help
