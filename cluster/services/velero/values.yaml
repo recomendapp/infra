@@ -4,11 +4,11 @@ configuration:
   backupStorageLocation:
     - name: default
       provider: aws
-      bucket: ""
+      bucket: "recomend-backups"
       config:
         region: auto
         s3ForcePathStyle: "true"
-        s3Url: ""
+        s3Url: "https://c960e9a51b5b0decbfee92d753e153b0.r2.cloudflarestorage.com"
 
   volumeSnapshotLocation:
     - name: default

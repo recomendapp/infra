@@ -33,21 +33,15 @@ help:
 	@echo "  make cluster-delete		Delete the cluster"
 	@echo ""
 	@echo "⚙️  Bootstrap:"
-	@echo "  make bootstrap				Run cluster bootstrap"
-	@echo "  make bootstrap-minimal		Run minimal bootstrap"
-	@echo "  make bootstrap-component	COMPONENT=<name>  Bootstrap a specific component"
-	@echo ""
-	@echo "🔍 Validation:"
-	@echo "  make validate				Validate all components"
-	@echo "  make validate-component	COMPONENT=<name>  Validate a specific component"
-	@echo ""
-	@echo "🧹 Uninstall:"
-	@echo "  make uninstall				Uninstall all components"
-	@echo "  make uninstall-component	COMPONENT=<name>  Uninstall a specific component"
+	@echo "  make install				Install cluster dependencies via GitOps"
 	@echo ""
 	@echo "🌐 Access & UI:"
 	@echo "  make argocd-ui				Access ArgoCD UI (port-forward)"
 	@echo "  make argocd-password		Show ArgoCD admin password"
+	@echo "  make argocd-sync			Manually trigger a sync of the root application"
+	@echo ""
+	@echo "🧹 Uninstall:"
+	@echo "  make uninstall				Uninstall all GitOps managed applications"
 	@echo ""
 	@echo "💾 Backup (Velero):"
 	@echo "  make backup-create			Create a manual backup"
@@ -108,54 +102,12 @@ cluster-delete: generate-cluster-config
 
 
 # ============================================================================
-# Bootstrap
+# Install
 # ============================================================================
 
-.PHONY: bootstrap
-bootstrap:
-	@./scripts/profiles/full.sh
-
-.PHONY: bootstrap-minimal
-bootstrap-minimal:
-	@./scripts/profiles/minimal.sh
-
-.PHONY: bootstrap-component
-bootstrap-component:
-	@if [ -z "$(COMPONENT)" ]; then \
-		echo "❌ Usage: make bootstrap-component COMPONENT=argocd"; \
-		exit 1; \
-	fi; \
-	./scripts/components/$(COMPONENT)/install.sh
-
-# ============================================================================
-# Validation
-# ============================================================================
-
-.PHONY: validate
-validate:
-	@echo "🔍 Validating all components..."; \
-	errors=0; \
-	for component in cert-manager external-secrets argocd velero; do \
-		if [ -f "./scripts/components/$$component/validate.sh" ]; then \
-			echo ""; \
-			./scripts/components/$$component/validate.sh || ((errors++)); \
-		fi; \
-	done; \
-	echo ""; \
-	if [ $$errors -eq 0 ]; then \
-		echo "✅ All validations passed"; \
-	else \
-		echo "❌ $$errors validation(s) failed"; \
-		exit 1; \
-	fi
-
-.PHONY: validate-component
-validate-component:
-	@if [ -z "$(COMPONENT)" ]; then \
-		echo "❌ Usage: make validate-component COMPONENT=argocd"; \
-		exit 1; \
-	fi; \
-	./scripts/components/$(COMPONENT)/validate.sh
+.PHONY: install
+install:
+	@./scripts/install.sh
 
 # ============================================================================
 # Uninstall
@@ -164,27 +116,6 @@ validate-component:
 .PHONY: uninstall
 uninstall:
 	@./scripts/uninstall.sh
-
-.PHONY: uninstall-component
-uninstall-component:
-	@if [ -z "$(COMPONENT)" ]; then \
-		echo "❌ Usage: make uninstall-component COMPONENT=argocd"; \
-		exit 1; \
-	fi; \
-	./scripts/components/$(COMPONENT)/uninstall.sh
-
-.PHONY: uninstall-all
-uninstall-all:
-	@echo "⚠️  This will DELETE everything from the cluster!"; \
-	read -p "Type 'DELETE' to confirm: " confirm; \
-	if [ "$$confirm" = "DELETE" ]; then \
-		for component in gitops argocd velero external-dns infisical external-secrets cert-manager; do \
-			./scripts/components/$$component/uninstall.sh 2>/dev/null || true; \
-		done; \
-		echo "✅ Full uninstall complete"; \
-	else \
-		echo "❌ Cancelled"; \
-	fi
 
 # ============================================================================
 # Access & UI
@@ -209,6 +140,14 @@ argocd-ui:
 	@echo "Press Ctrl+C to stop port-forward"
 	@echo ""
 	@kubectl port-forward svc/argocd-server -n argocd 8080:443
+
+.PHONY: argocd-sync
+argocd-sync:
+	@echo "🔄 Syncing ArgoCD root application..."
+	@kubectl -n argocd patch app root --type merge -p '{"spec":{"syncPolicy":{"automated":null}}}' >/dev/null
+	@argocd app sync root
+	@kubectl -n argocd patch app root --type merge -p '{"spec":{"syncPolicy":{"automated":{"prune":true,"selfHeal":true}}}}' >/dev/null
+	@echo "✅ Sync complete."
 
 
 # ============================================================================
@@ -236,6 +175,17 @@ backup-status:
 
 .PHONY: backup-restore
 backup-restore:
+	@echo " B"
+	@echo " \033[1;31m⚠️  WARNING:\033[0m Before restoring, you must disable the applications in Git that use the"
+	@echo "          volumes being restored (e.g., by setting 'enabled: false' in the Helm chart values)."
+	@echo "          This prevents ArgoCD from interfering with the restore process."
+	@echo ""
+	@read -p "Have you disabled the applications in Git? [y/N] " -n 1 -r; \
+	echo; \
+	if ! [[ $$REPLY =~ ^[Yy]$$ ]]; then \
+		echo "❌ Cancelled. Please disable applications in Git before restoring."; exit 1; \
+	fi; \
+	echo ""
 	@echo "📋 Available Velero backups:"; \
 	velero backup get; \
 	echo ""; \
@@ -266,17 +216,5 @@ backup-restore:
 # ============================================================================
 # Restore
 # ============================================================================
-
-.PHONY: disaster-recovery
-disaster-recovery:
-	@./scripts/restore.sh
-
-.PHONY: restore-diagnose
-restore-diagnose:
-	@if [ -z "$(RESTORE_NAME)" ]; then \
-		./scripts/restore/diagnose.sh; \
-		exit 0; \
-	fi; \
-	./scripts/restore/diagnose.sh "$(RESTORE_NAME)"
 
 .DEFAULT_GOAL := help

@@ -1,19 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cluster-root
+  name: infisical-config
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "21"
 spec:
   project: default
   source:
     repoURL: https://github.com/recomendapp/infra.git
     targetRevision: main
-    path: cluster
-    directory:
-      recurse: true
+    path: cluster/services/infisical-config
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: external-secrets
   syncPolicy:
     automated:
       prune: true
