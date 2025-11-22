@@ -1,4 +1,5 @@
-deployNodeAgent: true
+nodeAgent:
+  enabled: true
 
 configuration:
   backupStorageLocation:
@@ -24,12 +25,10 @@ credentials:
   secretContents:
     cloud: ""
 
-initContainers:
+extraPlugins:
   - name: velero-plugin-for-aws
-    image: velero/velero-plugin-for-aws:v1.10.0
-    volumeMounts:
-      - mountPath: /target
-        name: plugins
+    image: velero/velero-plugin-for-aws:v1.9.0
+
 
 schedules:
   daily:
