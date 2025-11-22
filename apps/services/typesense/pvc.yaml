@@ -2,6 +2,8 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: typesense-data
+  annotations:
+    csi.hetzner.cloud/volume-name: "typesense-data"
 spec:
   storageClassName: hcloud-volumes
   accessModes:
