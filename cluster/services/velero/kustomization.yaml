@@ -12,3 +12,4 @@ helmCharts:
     version: 11.2.0
     releaseName: velero
     valuesFile: values.yaml
+    includeCRDs: true
