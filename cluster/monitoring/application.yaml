@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: prometheus
+  name: monitoring
   namespace: argocd
 spec:
   project: default
@@ -25,7 +25,7 @@ spec:
                       storage: 20Gi
   destination:
     server: "https://kubernetes.default.svc"
-    namespace: prometheus
+    namespace: monitoring
   syncPolicy:
     automated:
       prune: true
