@@ -23,11 +23,6 @@ spec:
               prefectUiApiUrl: "https://prefect.recomend.app/api"
             
             env:
-              - name: PREFECT_SERVER_API_AUTH_STRING
-                valueFrom:
-                  secretKeyRef:
-                    name: prefect-auth-secret
-                    key: auth-string
               - name: PREFECT_SERVER_API_CSRF_PROTECTION_ENABLED
                 value: "true"
               - name: PREFECT_SERVER_API_CSRF_TOKEN_EXPIRATION
