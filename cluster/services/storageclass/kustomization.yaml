@@ -1,0 +1,8 @@
+resources:
+  - base.yaml
+
+patches:
+  - path: patch.yaml
+    target:
+      kind: StorageClass
+      name: hcloud-volumes
