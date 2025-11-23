@@ -57,7 +57,6 @@ spec:
   - metadata:
       name: data
       annotations:
-        backup.velero.io/backup-volumes: data
         resize.topolvm.io/storage_limit: "20Gi"
         resize.topolvm.io/threshold: "20%"
         resize.topolvm.io/increase: "25%"
