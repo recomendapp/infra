@@ -3,6 +3,7 @@ kind: Service
 metadata:
   name: typesense
 spec:
+  clusterIP: None
   selector:
     app: typesense
   ports:

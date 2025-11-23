@@ -1,8 +1,9 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: typesense
 spec:
+  serviceName: typesense
   replicas: 1
   selector:
     matchLabels:
@@ -27,10 +28,16 @@ spec:
               key: TYPESENSE_API_KEY
         ports:
         - containerPort: 8108
+          name: http
         volumeMounts:
         - name: data
           mountPath: /data
-      volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: typesense-data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: hcloud-volumes
+      resources:
+        requests:
+          storage: 10Gi
