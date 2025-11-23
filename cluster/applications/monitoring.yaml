@@ -15,8 +15,22 @@ spec:
       valuesObject:
         grafana:
           enabled: true
+          ingress:
+            enabled: true
+            ingressClassName: traefik
+            annotations:
+              cert-manager.io/cluster-issuer: letsencrypt-staging
+              traefik.ingress.kubernetes.io/router.entrypoints: websecure
+            hosts:
+              - grafana.recomend.app
+            tls:
+              - secretName: grafana-tls
+                hosts:
+                  - grafana.recomend.app
+
         prometheus-node-exporter:
           hostPort: 19100
+
         prometheus:
           prometheusSpec:
             storageSpec:
