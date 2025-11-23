@@ -18,6 +18,7 @@ and then apply the root application to bootstrap the cluster."
         "cert-manager"
         "external-secrets"
         "infisical"
+		"velero"
         "argocd"
         "gitops"
     )

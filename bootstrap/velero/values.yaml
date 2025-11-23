@@ -31,14 +31,30 @@ initContainers:
       - mountPath: /target
         name: plugins
 
+nodeAgent:
+  podVolumePath: /var/lib/kubelet/pods
+  privileged: false
+  tolerations:
+    - effect: NoSchedule
+      operator: Exists
+  resources:
+    requests:
+      memory: 200Mi
+      cpu: 500m
+    limits:
+      memory: 1Gi
+      cpu: 1000m
+
+# Schedule de backup quotidien
 schedules:
   daily:
     disabled: false
-    schedule: "0 2 * * *"
+    schedule: "0 2 * * *"  # 2h du matin
     useOwnerReferencesInBackup: false
     template:
-      ttl: "720h"
+      ttl: "720h"  # 30 jours
       includedNamespaces:
         - "*"
       excludedNamespaces:
         - velero
+      defaultVolumesToFsBackup: true  # Backup des volumes dans le schedule
