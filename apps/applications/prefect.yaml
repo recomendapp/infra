@@ -51,6 +51,10 @@ spec:
             selfHostedServerApiConfig:
               apiUrl: "http://prefect-server.prefect.svc.cluster.local:4200/api"
 
+              basicAuth:
+                enabled: true
+                existingSecret: "prefect-auth-secret"
+
     - repoURL: https://github.com/recomendapp/infra.git
       targetRevision: main
       path: apps/services/prefect
