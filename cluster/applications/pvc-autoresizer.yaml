@@ -14,7 +14,8 @@ spec:
         controller:
           args:
             prometheusURL: "http://prometheus-kube-prometheus-prometheus.monitoring.svc:9090"
-          podAnnotations:
+        service:
+          annotations:
             prometheus.io/scrape: "true"
             prometheus.io/path: "/metrics"
             prometheus.io/port: "8080"
