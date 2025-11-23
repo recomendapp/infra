@@ -13,7 +13,7 @@ spec:
     path: cluster/services/traefik-patch
   destination:
     server: https://kubernetes.default.svc
-    namespace: kube-system # Traefik service is often in kube-system
+    namespace: kube-system
   syncPolicy:
     automated:
       prune: true
