@@ -3,25 +3,25 @@ kind: Application
 metadata:
   name: pvc-autoresizer
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "50"
 spec:
   project: default
   source:
-    repoURL: 'https://autoscaler.github.io/pvc-autoresizer-helm'
+    repoURL: 'https://topolvm.github.io/pvc-autoresizer/'
     chart: pvc-autoresizer
-    targetRevision: 2.3.0
+    targetRevision: 0.15.1
     helm:
       valuesObject:
-        prometheus:
-          url: "http://prometheus-kube-prometheus-prometheus.monitoring.svc"
-          port: 9090
+        controller:
+          args:
+            prometheusURL: "http://prometheus-kube-prometheus-prometheus.monitoring.svc:9090"
+
   destination:
     server: "https://kubernetes.default.svc"
     namespace: pvc-autoresizer
+
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-    - CreateNamespace=true
+      - CreateNamespace=true
