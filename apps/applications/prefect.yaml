@@ -49,12 +49,30 @@ spec:
             config:
               workPool: kube
               jobNamespace: prefect
+              baseJobTemplate:
+                configuration: |
+                  {
+                    "job_configuration": {
+                      "namespace": "prefect",
+                      "image": "prefecthq/prefect:3-latest",
+                      "image_pull_policy": "IfNotPresent"
+                    },
+                    "variables": {
+                      "type": "object",
+                      "properties": {
+                        "namespace": {
+                          "type": "string",
+                          "default": "prefect"
+                        }
+                      }
+                    }
+                  }
             selfHostedServerApiConfig:
               apiUrl: "http://prefect-server.prefect.svc.cluster.local:4200/api"
-
               basicAuth:
                 enabled: true
                 existingSecret: "prefect-auth-secret"
+          
           role:
             namespace: prefect
 
