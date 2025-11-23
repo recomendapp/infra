@@ -25,8 +25,6 @@ spec:
             env:
               - name: PREFECT_SERVER_API_CSRF_PROTECTION_ENABLED
                 value: "true"
-              - name: PREFECT_SERVER_API_CSRF_TOKEN_EXPIRATION
-                value: "3600"
 
           postgresql:
             enabled: true
