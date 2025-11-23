@@ -5,18 +5,20 @@ metadata:
   namespace: argocd
 spec:
   project: default
-  source:
-    repoURL: 'https://topolvm.github.io/pvc-autoresizer/'
-    chart: pvc-autoresizer
-    targetRevision: 0.15.1
-    helm:
-      valuesObject:
-        controller:
-          args:
-            prometheusURL: "http://prometheus-kube-prometheus-prometheus.monitoring.svc:9090"
-        serviceMonitor:
-          enabled: true
-          interval: 30s
+  sources:
+    - repoURL: 'https://topolvm.github.io/pvc-autoresizer/'
+      chart: pvc-autoresizer
+      targetRevision: 0.15.1
+      helm:
+        valuesObject:
+          controller:
+            args:
+              prometheusURL: "http://prometheus-kube-prometheus-prometheus.monitoring.svc:9090"
+    
+    - repoURL: https://github.com/recomendapp/infra.git
+      targetRevision: main
+      path: cluster/services/pvc-autoresizer
+
   destination:
     server: "https://kubernetes.default.svc"
     namespace: pvc-autoresizer

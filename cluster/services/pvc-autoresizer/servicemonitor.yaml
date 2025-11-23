@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: pvc-autoresizer
+  namespace: pvc-autoresizer
+  labels:
+    app.kubernetes.io/name: pvc-autoresizer
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: pvc-autoresizer
+  endpoints:
+    - port: metrics
+      interval: 30s
+      path: /metrics
