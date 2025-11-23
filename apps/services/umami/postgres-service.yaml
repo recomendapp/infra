@@ -3,7 +3,10 @@ kind: Service
 metadata:
   name: umami-postgres
 spec:
+  clusterIP: None
   selector:
     app: umami-postgres
   ports:
     - port: 5432
+      targetPort: 5432
+      name: postgres

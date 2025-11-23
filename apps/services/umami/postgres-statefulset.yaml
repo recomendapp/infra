@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: umami-postgres
+spec:
+  clusterIP: None
+  selector:
+    app: umami-postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: umami-postgres
+spec:
+  serviceName: umami-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: umami-postgres
+  template:
+    metadata:
+      annotations:
+        backup.velero.io/backup-volumes: data
+      labels:
+        app: umami-postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:16-alpine
+        envFrom:
+          - secretRef:
+              name: umami-postgres-secret
+        env:
+          - name: PGDATA
+            value: /var/lib/postgresql/data/pgdata
+        ports:
+          - containerPort: 5432
+            name: postgres
+        volumeMounts:
+          - name: data
+            mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          exec:
+            command:
+              - pg_isready
+              - -U
+              - postgres
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+              - pg_isready
+              - -U
+              - postgres
+          initialDelaySeconds: 5
+          periodSeconds: 5
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      annotations:
+        backup.velero.io/backup-volumes: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: hcloud-volumes
+      resources:
+        requests:
+          storage: 10Gi

@@ -1,6 +1,5 @@
 resources:
-- postgres-deployment.yaml
-- postgres-pvc.yaml
+- postgres-statefulset.yaml
 - postgres-secret.yaml
 - postgres-service.yaml
 - umami-deployment.yaml
