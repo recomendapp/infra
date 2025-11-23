@@ -13,13 +13,10 @@ spec:
       helm:
         valuesObject:
           server:
-            replicaCount: 1
-            # Configuration UI pour l'accès externe
-            uiConfig:
-              prefectUiApiUrl: "https://prefect.recomend.app/api"
-            
-            # Variables d'environnement supplémentaires si nécessaire
+            replicaCount: 1            
             env:
+              - name: PREFECT_UI_API_URL
+                value: "https://prefect.recomend.app/api"
               - name: PREFECT_UI_URL
                 value: "https://prefect.recomend.app"
 
