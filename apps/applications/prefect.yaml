@@ -14,11 +14,8 @@ spec:
         valuesObject:
           server:
             replicaCount: 1            
-            env:
-              - name: PREFECT_UI_API_URL
-                value: "https://prefect.recomend.app/api"
-              - name: PREFECT_UI_URL
-                value: "https://prefect.recomend.app"
+            uiConfig:
+              prefectUiApiUrl: "https://prefect.recomend.app/api"
 
           postgresql:
             enabled: true
