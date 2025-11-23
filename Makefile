@@ -149,72 +149,11 @@ argocd-sync:
 	@kubectl -n argocd patch app root --type merge -p '{"spec":{"syncPolicy":{"automated":{"prune":true,"selfHeal":true}}}}' >/dev/null
 	@echo "✅ Sync complete."
 
-
 # ============================================================================
-# Velero Backup Commands
+# Backup
 # ============================================================================
-
-.PHONY: backup-create
-backup-create:
-	@echo "💾 Creating manual backup..."
-	@velero backup create manual-backup-$$(date +%Y%m%d-%H%M%S)
-	@echo "✅ Backup created"
-
-.PHONY: backup-list
-backup-list:
-	@echo "📋 Listing backups..."
-	@velero backup get
-
-.PHONY: backup-status
-backup-status:
-	@echo "🔍 Velero status..."
-	@kubectl -n velero get pods
-	@echo ""
-	@echo "📍 Backup locations:"
-	@velero backup-location get
-
-.PHONY: backup-restore
-backup-restore:
-	@echo " B"
-	@echo " \033[1;31m⚠️  WARNING:\033[0m Before restoring, you must disable the applications in Git that use the"
-	@echo "          volumes being restored (e.g., by setting 'enabled: false' in the Helm chart values)."
-	@echo "          This prevents ArgoCD from interfering with the restore process."
-	@echo ""
-	@read -p "Have you disabled the applications in Git? [y/N] " -n 1 -r; \
-	echo; \
-	if ! [[ $$REPLY =~ ^[Yy]$$ ]]; then \
-		echo "❌ Cancelled. Please disable applications in Git before restoring."; exit 1; \
-	fi; \
-	echo ""
-	@echo "📋 Available Velero backups:"; \
-	velero backup get; \
-	echo ""; \
-	read -p "👉 Enter backup name to restore: " BACKUP; \
-	if [ -z "$$BACKUP" ]; then \
-		echo "❌ No backup selected"; exit 1; \
-	fi; \
-	echo ""; \
-	read -p "⚠️ This will restore '$$BACKUP'. Continue? [y/N] " CONFIRM; \
-	if ! echo "$$CONFIRM" | grep -iq "^y"; then \
-		echo "❌ Cancelled"; exit 1; \
-	fi; \
-	echo ""; \
-	echo "⏳ Checking Velero availability..."; \
-	if ! kubectl -n velero get deploy/velero >/dev/null 2>&1; then \
-		echo "❌ Velero deployment not found or cluster unreachable"; exit 1; \
-	fi; \
-	echo "⏳ Waiting for Velero pod to be ready..."; \
-	if ! kubectl -n velero rollout status deploy/velero --timeout=60s >/dev/null 2>&1; then \
-		echo "❌ Velero is not ready — aborting restore"; exit 1; \
-	fi; \
-	echo "🚀 Launching restore: $$BACKUP"; \
-	if ! velero restore create --from-backup "$$BACKUP"; then \
-		echo "❌ Restore failed to launch"; exit 1; \
-	fi; \
-	echo "✅ Restore launched."
-
-# ============================================================================
-# Restore
-# ============================================================================
+.PHONY: backup
+backup:
+	@./scripts/backup/entrypoint.sh
 
 .DEFAULT_GOAL := help
