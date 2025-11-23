@@ -7,40 +7,53 @@ metadata:
     argocd.argoproj.io/sync-wave: "50"
 spec:
   project: default
-  source:
-    repoURL: 'https://prometheus-community.github.io/helm-charts'
-    chart: kube-prometheus-stack
-    targetRevision: 79.7.1
-    helm:
-      valuesObject:
-        grafana:
-          enabled: true
-          ingress:
+  sources:
+    - repoURL: 'https://prometheus-community.github.io/helm-charts'
+      chart: kube-prometheus-stack
+      targetRevision: 79.7.1
+      helm:
+        valuesObject:
+          grafana:
             enabled: true
-            ingressClassName: traefik
-            annotations:
-              cert-manager.io/cluster-issuer: letsencrypt-staging
-              traefik.ingress.kubernetes.io/router.entrypoints: websecure
-            hosts:
-              - grafana.recomend.app
-            tls:
-              - secretName: grafana-tls
-                hosts:
-                  - grafana.recomend.app
+            ingress:
+              enabled: true
+              ingressClassName: traefik
+              annotations:
+                cert-manager.io/cluster-issuer: letsencrypt-staging
+                traefik.ingress.kubernetes.io/router.entrypoints: websecure
+              hosts:
+                - grafana.recomend.app
+              tls:
+                - secretName: grafana-tls
+                  hosts:
+                    - grafana.recomend.app
+            sidecar:
+              dashboards:
+                enabled: true
+                label: grafana_dashboard
+                labelValue: "1"
+                searchNamespace: ALL
 
-        prometheus-node-exporter:
-          hostPort: 19100
+          prometheus-node-exporter:
+            hostPort: 19100
 
-        prometheus:
-          prometheusSpec:
-            storageSpec:
-              volumeClaimTemplate:
-                spec:
-                  storageClassName: hcloud-volumes
-                  accessModes: ["ReadWriteOnce"]
-                  resources:
-                    requests:
-                      storage: 20Gi
+          prometheus:
+            prometheusSpec:
+              storageSpec:
+                volumeClaimTemplate:
+                  spec:
+                    storageClassName: hcloud-volumes
+                    accessModes: ["ReadWriteOnce"]
+                    resources:
+                      requests:
+                        storage: 20Gi
+    
+    - repoURL: https://github.com/recomendapp/infra.git
+      targetRevision: main
+      path: cluster/services/monitoring
+      directory:
+        recurse: true
+
   destination:
     server: "https://kubernetes.default.svc"
     namespace: monitoring
