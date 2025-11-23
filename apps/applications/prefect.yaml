@@ -48,7 +48,6 @@ spec:
             apiConfig: selfHostedServer
             config:
               workPool: kube
-              jobNamespace: "prefect"
               
             selfHostedServerApiConfig:
               apiUrl: "http://prefect-server.prefect.svc.cluster.local:4200/api"
@@ -56,9 +55,6 @@ spec:
               basicAuth:
                 enabled: true
                 existingSecret: "prefect-auth-secret"
-
-          role:
-            create: true
 
     - repoURL: https://github.com/recomendapp/infra.git
       targetRevision: main
