@@ -2,10 +2,13 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: pvc-autoresizer
-  namespace: pvc-autoresizer
+  namespace: monitoring
   labels:
     app.kubernetes.io/name: pvc-autoresizer
 spec:
+  namespaceSelector:
+    matchNames:
+      - pvc-autoresizer
   selector:
     matchLabels:
       app.kubernetes.io/name: pvc-autoresizer
