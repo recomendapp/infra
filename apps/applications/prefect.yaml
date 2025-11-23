@@ -44,13 +44,14 @@ spec:
       targetRevision: 2025.11.21180339
       helm:
         valuesObject:
-          namespaceOverride: "prefect"
-
           worker:
             apiConfig: selfHostedServer
             config:
               workPool: kube
-              jobNamespace: "prefect"
+            
+            extraEnvVars:
+              - name: PREFECT_WORKER_JOB_NAMESPACE
+                value: "prefect"
               
             selfHostedServerApiConfig:
               apiUrl: "http://prefect-server.prefect.svc.cluster.local:4200/api"
@@ -58,9 +59,6 @@ spec:
               basicAuth:
                 enabled: true
                 existingSecret: "prefect-auth-secret"
-
-          role:
-            create: true
 
     - repoURL: https://github.com/recomendapp/infra.git
       targetRevision: main
