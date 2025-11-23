@@ -1,0 +1,79 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prefect
+  namespace: argocd
+spec:
+  project: default
+
+  sources:
+    - repoURL: https://prefecthq.github.io/prefect-helm
+      chart: prefect-server
+      targetRevision: 2025.11.21180339
+      helm:
+        valuesObject:
+          server:
+            enabled: true
+
+          ui:
+            enabled: true
+            ingress:
+              enabled: true
+              className: traefik
+              annotations:
+                cert-manager.io/cluster-issuer: letsencrypt-staging
+              hosts:
+                - host: prefect.recomend.app
+                  paths:
+                    - path: /
+                      pathType: Prefix
+              tls:
+                - secretName: prefect-tls
+                  hosts:
+                    - prefect.recomend.app
+
+          database:
+            enabled: true
+            postgresql:
+              primary:
+                persistence:
+                  enabled: true
+                  storageClass: hcloud-volumes
+                  size: 10Gi
+                  annotations:
+                    resize.topolvm.io/storage_limit: "50Gi"
+                    resize.topolvm.io/threshold: "20%"
+                    resize.topolvm.io/increase: "25%"
+                    backup.velero.io/backup-volumes: "data"
+
+          # serverResources:
+          #   requests:
+          #     cpu: 250m
+          #     memory: 256Mi
+          #   limits:
+          #     cpu: 500m
+          #     memory: 512Mi
+
+    - repoURL: https://prefecthq.github.io/prefect-helm
+      chart: prefect-worker
+      targetRevision: 2025.11.21180339
+
+      helm:
+        valuesObject:
+          worker:
+            apiConfig: selfHostedServer
+            config:
+              workPool: kube
+            selfHostedServerApiConfig:
+              apiUrl: "http://prefect-server.prefect.svc.cluster.local:4200/api"
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: prefect
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
