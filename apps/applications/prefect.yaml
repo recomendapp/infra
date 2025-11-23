@@ -44,37 +44,23 @@ spec:
       targetRevision: 2025.11.21180339
       helm:
         valuesObject:
+          namespaceOverride: "prefect"
+
           worker:
             apiConfig: selfHostedServer
             config:
               workPool: kube
-              jobNamespace: prefect
-              baseJobTemplate:
-                configuration: |
-                  {
-                    "job_configuration": {
-                      "namespace": "prefect",
-                      "image": "prefecthq/prefect:3-latest",
-                      "image_pull_policy": "IfNotPresent"
-                    },
-                    "variables": {
-                      "type": "object",
-                      "properties": {
-                        "namespace": {
-                          "type": "string",
-                          "default": "prefect"
-                        }
-                      }
-                    }
-                  }
+              jobNamespace: "prefect"
+              
             selfHostedServerApiConfig:
               apiUrl: "http://prefect-server.prefect.svc.cluster.local:4200/api"
+
               basicAuth:
                 enabled: true
                 existingSecret: "prefect-auth-secret"
-          
+
           role:
-            namespace: prefect
+            create: true
 
     - repoURL: https://github.com/recomendapp/infra.git
       targetRevision: main
