@@ -21,6 +21,9 @@ spec:
 
           ui:
             replicaCount: 1
+            env:
+              - name: PREFECT_UI_API_URL
+                value: "https://prefect.recomend.app/api"
             service:
               port: 4200
 
