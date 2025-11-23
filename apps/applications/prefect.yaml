@@ -48,10 +48,6 @@ spec:
             apiConfig: selfHostedServer
             config:
               workPool: kube
-            
-            extraEnvVars:
-              - name: PREFECT_WORKER_JOB_NAMESPACE
-                value: "prefect"
               
             selfHostedServerApiConfig:
               apiUrl: "http://prefect-server.prefect.svc.cluster.local:4200/api"
