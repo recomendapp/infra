@@ -20,4 +20,14 @@ spec:
       selfHeal: true
     syncOptions:
       - ServerSideApply=true
-      - Force=true
+      - RespectIgnoreDifferences=true
+  ignoreDifferences:
+    - group: storage.k8s.io
+      kind: StorageClass
+      name: hcloud-volumes
+      jsonPointers:
+        - /provisioner
+        - /parameters
+        - /reclaimPolicy
+        - /volumeBindingMode
+        - /allowVolumeExpansion
