@@ -44,8 +44,6 @@ spec:
       targetRevision: 2025.11.21180339
       helm:
         valuesObject:
-          namespaceOverride: "prefect"
-
           worker:
             apiConfig: selfHostedServer
             config:
