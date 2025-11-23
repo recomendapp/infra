@@ -13,7 +13,7 @@ spec:
         valuesObject:
           controller:
             args:
-              prometheusURL: "http://prometheus-kube-prometheus-prometheus.monitoring.svc:9090"
+              prometheusURL: "http://monitoring-kube-prometheus-prometheus.monitoring.svc:9090"
     
     - repoURL: https://github.com/recomendapp/infra.git
       targetRevision: main
