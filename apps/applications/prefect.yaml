@@ -18,20 +18,8 @@ spec:
 
           ui:
             replicaCount: 1
-            ingress:
-              enabled: true
-              className: traefik
-              annotations:
-                cert-manager.io/cluster-issuer: letsencrypt-staging
-              hosts:
-                - host: prefect.recomend.app
-                  paths:
-                    - path: /
-                      pathType: Prefix
-              tls:
-                - secretName: prefect-tls
-                  hosts:
-                    - prefect.recomend.app
+            service:
+              port: 4200
 
           postgresql:
             enabled: true
@@ -46,6 +34,24 @@ spec:
                   resize.topolvm.io/increase: "25%"
                   backup.velero.io/backup-volumes: "data"
 
+    - repoURL: https://prefecthq.github.io/prefect-helm
+      chart: prefect-worker
+      targetRevision: 2025.11.21180339
+      helm:
+        valuesObject:
+          worker:
+            apiConfig: selfHostedServer
+            config:
+              workPool: kube
+            selfHostedServerApiConfig:
+              apiUrl: "http://prefect-server.prefect.svc.cluster.local:4200/api"
+
+    - repoURL: https://github.com/recomendapp/infra.git
+      targetRevision: main
+      path: apps/services/prefect
+      directory:
+        recurse: true
+
   destination:
     server: https://kubernetes.default.svc
     namespace: prefect
@@ -56,3 +62,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
