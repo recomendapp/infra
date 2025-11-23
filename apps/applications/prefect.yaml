@@ -15,6 +15,13 @@ spec:
 
           api:
             replicaCount: 1
+            extraEnvVars:
+              - name: PREFECT_UI_API_URL
+                value: "https://prefect.recomend.app/api"
+              - name: PREFECT_UI_URL
+                value: "https://prefect.recomend.app"
+              - name: PREFECT_SERVER_API_HOST
+                value: "0.0.0.0"
 
           ui:
             replicaCount: 1
@@ -44,7 +51,7 @@ spec:
             config:
               workPool: kube
             selfHostedServerApiConfig:
-              apiUrl: "http://prefect-server.prefect.svc.cluster.local:4200/api"
+              apiUrl: "https://prefect.recomend.app/api"
 
     - repoURL: https://github.com/recomendapp/infra.git
       targetRevision: main
