@@ -19,6 +19,7 @@ and then apply the root application to bootstrap the cluster."
         "external-secrets"
         "infisical"
 		"velero"
+        "reflector"
         "argocd"
         "gitops"
     )

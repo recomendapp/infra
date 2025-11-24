@@ -7,6 +7,7 @@ declare -A HELM_REPOS=(
     ["external-dns"]="https://kubernetes-sigs.github.io/external-dns/"
     ["argo"]="https://argoproj.github.io/argo-helm"
     ["vmware-tanzu"]="https://vmware-tanzu.github.io/helm-charts"
+    ["emberstack"]="https://emberstack.github.io/helm-charts"
 )
 
 # Add a specific Helm repo

@@ -18,6 +18,7 @@ main() {
         "external-secrets"
         "infisical"
         "velero"
+        "reflector"
     )
     
     for component in "${components[@]}"; do
