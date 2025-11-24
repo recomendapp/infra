@@ -21,3 +21,45 @@ spec:
           args: ["--config", "/config.yaml"]
           ports:
             - containerPort: 3000
+          env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: notify-secret
+                  key: API_KEY
+
+            - name: NOVU_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: notify-secret
+                  key: NOVU_SECRET_KEY
+
+            - name: SUPABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: notify-secret
+                  key: SUPABASE_URL
+
+            - name: SUPABASE_SERVICE_ROLE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: notify-secret
+                  key: SUPABASE_SERVICE_ROLE_KEY
+
+            - name: NOVU_PROVIDER_ID_FCM
+              valueFrom:
+                secretKeyRef:
+                  name: notify-secret
+                  key: NOVU_PROVIDER_ID_FCM
+
+            - name: NOVU_PROVIDER_ID_EXPO
+              valueFrom:
+                secretKeyRef:
+                  name: notify-secret
+                  key: NOVU_PROVIDER_ID_EXPO
+
+            - name: NOVU_PROVIDER_ID_APNS
+              valueFrom:
+                secretKeyRef:
+                  name: notify-secret
+                  key: NOVU_PROVIDER_ID_APNS
