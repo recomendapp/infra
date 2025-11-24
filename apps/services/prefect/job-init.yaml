@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: prefect-init
+  namespace: prefect
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: init
+          image: prefecthq/prefect:3-latest
+          env:
+            - name: PREFECT_API_URL
+              value: "http://prefect-server.prefect.svc.cluster.local:4200/api"
+            - name: PREFECT_API_AUTH_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: prefect-auth-secret
+                  key: auth-string
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Waiting for Prefect API..."
+              until curl -sf $PREFECT_API_URL/health; do
+                sleep 2
+              done
+
+              python <<'EOF'
+from prefect.blocks.system import Secret
+
+Secret(value="super-secret").save("my-default-secret")
+
+print("Default blocks created")
+EOF
