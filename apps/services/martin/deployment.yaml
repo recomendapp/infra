@@ -16,7 +16,7 @@ spec:
         - name: github-credentials
       containers:
         - name: martin
-          image: ghcr.io/recomendapp/martin@sha256:e1b37292818e9ac22eb2b03671bd72e8ba8f95d9a1415c9fb3391f264d3eba9f
+          image: ghcr.io/recomendapp/martin:latest
           imagePullPolicy: Always
           args: ["--config", "/config.yaml"]
           ports:
