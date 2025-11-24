@@ -1,4 +1,4 @@
 resources:
   - ingress.yaml
-  - secret.yaml
+  - secrets.yaml
   - job-init.yaml

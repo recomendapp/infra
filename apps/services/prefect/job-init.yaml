@@ -19,19 +19,33 @@ spec:
                 secretKeyRef:
                   name: prefect-auth-secret
                   key: auth-string
+
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: github-token-secret
+                  key: token
+
           command:
             - /bin/sh
             - -c
             - |
               apt-get update && apt-get install -y curl
+              pip install prefect-github -q
 
               echo "Waiting for Prefect API..."
               until curl -sf "${PREFECT_API_URL}/health"; do
                 sleep 2
+                echo "Still waiting for Prefect API..."
               done
 
               python3 -c "
-              from prefect.blocks.system import Secret
-              Secret(value='default-secret-value').save('default-secret')
-              print('BLOCKS CREATED')
+              from prefect_github import GitHubCredentials
+              import os
+
+              github_token = os.environ['GITHUB_TOKEN']
+              print(f'Creating GitHub block with token: {github_token[:4]}****')
+              GitHubCredentials(token=github_token).save('github-credentials')
+              print('GitHub block created')
+
               "
