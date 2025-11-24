@@ -18,7 +18,6 @@ spec:
         - name: notify
           image: ghcr.io/recomendapp/notify:latest
           imagePullPolicy: Always
-          args: ["--config", "/config.yaml"]
           ports:
             - containerPort: 3000
           env:
