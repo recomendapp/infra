@@ -23,15 +23,15 @@ spec:
             - /bin/sh
             - -c
             - |
+              apt-get update && apt-get install -y curl
+
               echo "Waiting for Prefect API..."
               until curl -sf "${PREFECT_API_URL}/health"; do
                 sleep 2
               done
 
-              python3 - <<'EOF'
+              python3 -c "
               from prefect.blocks.system import Secret
-
-              Secret(value="default-secret-value").save("default-secret")
-
-              print("BLOCKS CREATED")
-              EOF
+              Secret(value='default-secret-value').save('default-secret')
+              print('BLOCKS CREATED')
+              "
