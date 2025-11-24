@@ -4,6 +4,7 @@ metadata:
   name: prefect-init
   namespace: prefect
 spec:
+  backoffLimit: 0
   template:
     spec:
       restartPolicy: Never
@@ -23,14 +24,14 @@ spec:
             - -c
             - |
               echo "Waiting for Prefect API..."
-              until curl -sf $PREFECT_API_URL/health; do
+              until curl -sf "${PREFECT_API_URL}/health"; do
                 sleep 2
               done
 
-              python <<'EOF'
-from prefect.blocks.system import Secret
+              python3 - <<'EOF'
+              from prefect.blocks.system import Secret
 
-Secret(value="super-secret").save("my-default-secret")
+              Secret(value="default-secret-value").save("default-secret")
 
-print("Default blocks created")
-EOF
+              print("BLOCKS CREATED")
+              EOF
