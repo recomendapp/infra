@@ -1,0 +1,14 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: notify-image-updater
+  namespace: argocd
+spec:
+  namespace: argocd
+  applicationRefs:
+    - namePattern: notify
+      images:
+        - alias: notify
+          imageName: ghcr.io/recomendapp/notify:latest
+          commonUpdateSettings:
+            updateStrategy: digest

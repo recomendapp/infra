@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notify
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notify
+  template:
+    metadata:
+      labels:
+        app: notify
+    spec:
+      imagePullSecrets:
+        - name: github-credentials
+      containers:
+        - name: notify
+          image: ghcr.io/recomendapp/notify:latest
+          imagePullPolicy: Always
+          args: ["--config", "/config.yaml"]
+          ports:
+            - containerPort: 3000
