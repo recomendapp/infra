@@ -23,16 +23,7 @@ main() {
     # Delete all AppProjects
     log_info "Deleting all AppProjects..."
     kubectl delete appprojects --all -n argocd --timeout=30s 2>/dev/null || log_warning "No AppProjects found"
-    
-    # Delete ArgoCD Image Updater
-    log_info "Deleting ArgoCD Image Updater..."
-    kubectl delete deploy argocd-image-updater-controller -n argocd 2>/dev/null || log_warning "Image Updater not found"
-    kubectl delete configmap argocd-image-updater-config -n argocd 2>/dev/null || true
-    kubectl delete configmap argocd-image-updater-ssh-config -n argocd 2>/dev/null || true
-    kubectl delete sa argocd-image-updater -n argocd 2>/dev/null || true
-    kubectl delete role argocd-image-updater -n argocd 2>/dev/null || true
-    kubectl delete rolebinding argocd-image-updater -n argocd 2>/dev/null || true
-    
+
     # Delete ExternalSecrets
     log_info "Deleting GitHub credentials..."
     kubectl delete externalsecret github-credentials -n argocd 2>/dev/null || log_warning "ExternalSecret not found"
@@ -55,7 +46,6 @@ main() {
 	kubectl delete crd applications.argoproj.io --ignore-not-found
 	kubectl delete crd applicationsets.argoproj.io --ignore-not-found
 	kubectl delete crd appprojects.argoproj.io --ignore-not-found
-	kubectl delete crd imageupdaters.argocd-image-updater.argoproj.io --ignore-not-found
 
 	# Retry namespace deletion now that CRDs are gone
 	log_info "Final namespace cleanup..."
