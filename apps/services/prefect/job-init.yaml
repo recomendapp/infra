@@ -28,13 +28,13 @@ spec:
             - name: GITHUB_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: github-token-secret
-                  key: token
+                  name: prefect-secrets
+                  key: GITHUB_TOKEN
 
             - name: TYPESENSE_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: typesense-secret
+                  name: prefect-secrets
                   key: TYPESENSE_API_KEY
 
             - name: TYPESENSE_HOST
@@ -49,13 +49,13 @@ spec:
             - name: SUPABASE_POSTGRES_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
-                  name: supabase-db-secret
+                  name: prefect-secrets
                   key: SUPABASE_POSTGRES_CONNECTION_STRING
 
             - name: TMDB_API_KEYS
               valueFrom:
                 secretKeyRef:
-                  name: tmdb-api-secret
+                  name: prefect-secrets
                   key: TMDB_API_KEYS
 
           command:
