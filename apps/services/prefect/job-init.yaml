@@ -54,7 +54,7 @@ spec:
                 echo "Still waiting for Prefect API..."
               done
 
-              python3 -c "
+              python3 - <<'EOF'
               from prefect_github import GitHubCredentials
               from prefect.blocks.system import Secret
               import os
@@ -88,5 +88,4 @@ spec:
               print("Typesense blocks created.")
 
               print("Init job completed successfully.")
-              
-              "
+              EOF
