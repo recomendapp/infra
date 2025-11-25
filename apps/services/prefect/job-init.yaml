@@ -26,6 +26,21 @@ spec:
                   name: github-token-secret
                   key: token
 
+            - name: TYPESENSE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: typesense-secret
+                  key: TYPESENSE_API_KEY
+
+            - name: TYPESENSE_HOST
+              value: "typesense.default.svc.cluster.local"
+
+            - name: TYPESENSE_PORT
+              value: "8108"
+
+            - name: TYPESENSE_PROTOCOL
+              value: "http"
+
           command:
             - /bin/sh
             - -c
@@ -41,11 +56,37 @@ spec:
 
               python3 -c "
               from prefect_github import GitHubCredentials
+              from prefect.blocks.system import Secret
               import os
 
-              github_token = os.environ['GITHUB_TOKEN']
-              print(f'Creating GitHub block with token: {github_token[:4]}****')
-              GitHubCredentials(token=github_token).save('github-credentials')
-              print('GitHub block created')
+              # ---------------------
+              # GitHub Credentials
+              # ---------------------
+              github_token = os.environ["GITHUB_TOKEN"]
+              print(f"Creating GitHub block...")
+              GitHubCredentials(token=github_token).save("github-credentials", overwrite=True)
+              print("GitHub block created.")
 
+              # ---------------------
+              # Typesense Blocks
+              # ---------------------
+              print("Creating Typesense blocks...")
+
+              Secret(value=os.environ["TYPESENSE_API_KEY"]).save(
+                  "typesense-api-key", overwrite=True
+              )
+              Secret(value=os.environ["TYPESENSE_HOST"]).save(
+                  "typesense-host", overwrite=True
+              )
+              Secret(value=os.environ["TYPESENSE_PORT"]).save(
+                  "typesense-port", overwrite=True
+              )
+              Secret(value=os.environ["TYPESENSE_PROTOCOL"]).save(
+                  "typesense-protocol", overwrite=True
+              )
+
+              print("Typesense blocks created.")
+
+              print("Init job completed successfully.")
+              
               "
