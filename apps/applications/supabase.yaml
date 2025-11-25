@@ -12,15 +12,13 @@ spec:
     - repoURL: https://github.com/lxup/supabase-kubernetes.git
       targetRevision: feature/supabase-2025
       path: charts/supabase
-      helm:
-        valueFiles:
-          - apps/services/supabase/values.yaml
 
     - repoURL: https://github.com/recomendapp/infra.git
       targetRevision: main
       path: apps/services/supabase
-      directory:
-        recurse: true
+      helm:
+        valueFiles:
+          - values.yaml
 
   destination:
     server: https://kubernetes.default.svc
