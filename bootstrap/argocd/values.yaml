@@ -1,9 +1,10 @@
 server:
   ingress:
     enabled: false
+  insecure: true
+  extraArgs:
+    - --insecure
 
 configs:
   cm:
-    # This is the correct way to add the kustomize build option
-    # via the Argo CD Helm chart values.
-    "kustomize.buildOptions": "--enable-helm"
+    kustomize.buildOptions: "--enable-helm"
