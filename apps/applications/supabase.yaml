@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: supabase
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "50"
+spec:
+  project: default
+
+  sources:
+    - repoURL: https://github.com/lxup/supabase-kubernetes.git
+      targetRevision: feature/supabase-2025
+      path: charts/supabase
+      helm:
+        valueFiles:
+          - apps/services/supabase/values.yaml
+
+    - repoURL: https://github.com/recomendapp/infra.git
+      targetRevision: main
+      path: apps/services/supabase
+      directory:
+        recurse: true
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: supabase
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
