@@ -18,6 +18,7 @@ spec:
           env:
             - name: PREFECT_API_URL
               value: "http://prefect-server.prefect.svc.cluster.local:4200/api"
+
             - name: PREFECT_API_AUTH_STRING
               valueFrom:
                 secretKeyRef:
@@ -45,6 +46,18 @@ spec:
             - name: TYPESENSE_PROTOCOL
               value: "http"
 
+            - name: SUPABASE_POSTGRES_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: supabase-db-secret
+                  key: SUPABASE_POSTGRES_CONNECTION_STRING
+
+            - name: TMDB_API_KEYS
+              valueFrom:
+                secretKeyRef:
+                  name: tmdb-api-secret
+                  key: TMDB_API_KEYS
+
           command:
             - /bin/sh
             - -c
@@ -64,10 +77,10 @@ spec:
               import os
 
               # ---------------------
-              # GitHub Credentials
+              # GitHub Credentials Block
               # ---------------------
+              print("Creating GitHub block...")
               github_token = os.environ["GITHUB_TOKEN"]
-              print(f"Creating GitHub block...")
               GitHubCredentials(token=github_token).save("github-credentials", overwrite=True)
               print("GitHub block created.")
 
@@ -90,6 +103,30 @@ spec:
               )
 
               print("Typesense blocks created.")
+
+              # ---------------------
+              # Supabase Postgres Block
+              # ---------------------
+              print("Creating Supabase Postgres block...")
+
+              Secret(value=os.environ["SUPABASE_POSTGRES_CONNECTION_STRING"]).save(
+                  "postgres-connection-string",
+                  overwrite=True
+              )
+
+              print("Supabase block created.")
+
+              # ---------------------
+              # TMDB Block
+              # ---------------------
+              print("Creating TMDB block...")
+
+              Secret(value=os.environ["TMDB_API_KEYS"]).save(
+                  "tmdb-api-key",
+                  overwrite=True
+              )
+
+              print("TMDB block created.")
 
               print("Init job completed successfully.")
               EOF
