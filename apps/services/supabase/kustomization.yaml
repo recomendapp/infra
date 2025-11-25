@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: supabase
+
+resources:
+  - secrets.yaml
+
+helmCharts:
+  - name: supabase
+    repo: https://github.com/lxup/supabase-kubernetes.git
+    version: feature/supabase-2025
+    releaseName: supabase
+    namespace: supabase
+    valuesFile: values.yaml
