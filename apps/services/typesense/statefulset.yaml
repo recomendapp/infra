@@ -22,7 +22,8 @@ spec:
         args:
           - "--data-dir=/data"
           - "--api-key=$(TYPESENSE_API_KEY)"
-          - "--enable-cors=false"
+          - "--enable-cors=true"
+          - "--cors-allowed-origins=*"
         env:
         - name: TYPESENSE_API_KEY
           valueFrom:
