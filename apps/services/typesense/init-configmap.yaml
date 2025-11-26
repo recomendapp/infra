@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: typesense-schemas
+data:
+  movies.json: |
+    {
+      "name": "movies",
+      "fields": [
+        { "name": "id", "type": "string" },
+        { "name": "original_title", "type": "string", "sort": true },
+        { "name": "titles", "type": "string[]", "locale": "" },
+        { "name": "popularity", "type": "float", "sort": true },
+        { "name": "runtime", "type": "int32", "optional": true },
+        { "name": "release_date", "type": "int64", "facet": true, "sort": true, "optional": true },
+        { "name": "genre_ids", "type": "int32[]", "facet": true }
+      ],
+      "default_sorting_field": "popularity"
+    }
+
+  persons.json: |
+    {
+      "name": "persons",
+      "fields": [
+        { "name": "id", "type": "string" },
+        { "name": "name", "type": "string" },
+        { "name": "also_known_as", "type": "string[]", "locale": "" },
+        { "name": "popularity", "type": "float", "sort": true },
+        { "name": "known_for_department", "type": "string", "facet": true, "optional": true }
+      ],
+      "default_sorting_field": "popularity"
+    }
+
+  playlists.json: |
+    {
+      "name": "playlists",
+      "fields": [
+        { "name": "id", "type": "int64" },
+        { "name": "title", "type": "string" },
+        { "name": "description", "type": "string", "optional": true },
+        { "name": "likes_count", "type": "int64", "sort": true },
+        { "name": "items_count", "type": "int64", "sort": true },
+        { "name": "created_at", "type": "int64", "sort": true },
+        { "name": "updated_at", "type": "int64", "sort": true },
+        { "name": "is_private", "type": "bool", "facet": true },
+        { "name": "owner_id", "type": "string", "facet": true },
+        { "name": "guest_ids", "type": "string[]", "facet": true },
+        { "name": "type", "type": "string", "facet": true }
+      ],
+      "default_sorting_field": "likes_count"
+    }
+
+  tv_series.json: |
+    {
+      "name": "tv_series",
+      "fields": [
+        { "name": "id", "type": "string" },
+        { "name": "original_name", "type": "string", "sort": true },
+        { "name": "names", "type": "string[]" },
+        { "name": "popularity", "type": "float", "sort": true },
+        { "name": "first_air_date", "type": "int64", "facet": true, "sort": true, "optional": true },
+        { "name": "last_air_date", "type": "int64", "facet": true, "sort": true, "optional": true },
+        { "name": "number_of_episodes", "type": "int32", "optional": true },
+        { "name": "number_of_seasons", "type": "int32", "optional": true },
+        { "name": "vote_average", "type": "float", "sort": true, "optional": true },
+        { "name": "vote_count", "type": "int32", "optional": true },
+        { "name": "status", "type": "string", "facet": true, "optional": true },
+        { "name": "type", "type": "string", "facet": true, "optional": true },
+        { "name": "genre_ids", "type": "int32[]", "facet": true }
+      ],
+      "default_sorting_field": "popularity"
+    }
+
+  users.json: |
+    {
+      "name": "users",
+      "fields": [
+        { "name": "id", "type": "string" },
+        { "name": "username", "type": "string" },
+        { "name": "full_name", "type": "string" },
+        { "name": "followers_count", "type": "int64", "sort": true }
+      ],
+      "default_sorting_field": "followers_count"
+    }

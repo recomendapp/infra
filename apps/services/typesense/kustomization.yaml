@@ -1,0 +1,6 @@
+resources:
+  - init-configmap.yaml
+  - secret.yaml
+  - service.yaml
+  - statefulset.yaml
+  - ingress.yaml
