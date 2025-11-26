@@ -48,6 +48,8 @@ spec:
             apiConfig: selfHostedServer
             config:
               workPool: kube
+              baseJobTemplate:
+                existingConfigMapName: prefect-base-job-template
               
             selfHostedServerApiConfig:
               apiUrl: "http://prefect-server.prefect.svc.cluster.local:4200/api"

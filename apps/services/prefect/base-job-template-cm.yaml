@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prefect-base-job-template
+  namespace: prefect
+data:
+  baseJobTemplate.json: |
+    {
+      "variables": {
+        "cpu_request":    { "type": "string", "default": "500m" },
+        "memory_request": { "type": "string", "default": "1Gi" },
+        "cpu_limit":      { "type": "string", "default": "1" },
+        "memory_limit":   { "type": "string", "default": "2Gi" }
+      },
+      "job_configuration": {
+        "job_manifest": {
+          "spec": {
+            "template": {
+              "spec": {
+                "restartPolicy": "Never",
+                "containers": [
+                  {
+                    "name": "prefect-job",
+                    "resources": {
+                      "requests": {
+                        "cpu": "{{ cpu_request }}",
+                        "memory": "{{ memory_request }}"
+                      },
+                      "limits": {
+                        "cpu": "{{ cpu_limit }}",
+                        "memory": "{{ memory_limit }}"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
