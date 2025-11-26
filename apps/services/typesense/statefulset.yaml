@@ -10,42 +10,12 @@ spec:
       app: typesense
   template:
     metadata:
-      # Don't backup Typesense data as it's rebuildable
+      # Typesense data can be rebuilded if lost (from main database)
       # annotations:
       #   backup.velero.io/backup-volumes: data
       labels:
         app: typesense
     spec:
-      initContainers:
-        - name: init-typesense-schema
-          image: curlimages/curl:8.0
-          command:
-            - sh
-            - -c
-            - |
-              echo "Waiting for Typesense..."
-              until curl -s http://typesense:8108/health; do sleep 2; done
-
-              for f in /schema/*.json; do
-                echo "Applying $f ..."
-                curl -s -X POST "http://typesense:8108/collections" \
-                  -H "Content-Type: application/json" \
-                  -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" \
-                  --data @$f \
-                || echo "-> Already exists, skipping"
-              done
-
-              echo "Init OK"
-          env:
-            - name: TYPESENSE_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: typesense-secret
-                  key: TYPESENSE_API_KEY
-          volumeMounts:
-            - name: schema
-              mountPath: /schema
-
       containers:
       - name: typesense
         image: typesense/typesense:29.0
@@ -65,12 +35,6 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /data
-
-      volumes:
-        - name: schema
-          configMap:
-            name: typesense-schemas
-
   volumeClaimTemplates:
   - metadata:
       name: data
