@@ -14,6 +14,13 @@ spec:
           controller:
             args:
               prometheusURL: "http://monitoring-kube-prometheus-prometheus.monitoring.svc:9090"
+            resources:
+              requests:
+                cpu: 50m
+                memory: 64Mi
+              limits:
+                cpu: 100m
+                memory: 128Mi
     
     - repoURL: https://github.com/recomendapp/infra.git
       targetRevision: main

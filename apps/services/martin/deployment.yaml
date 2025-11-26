@@ -21,3 +21,10 @@ spec:
           args: ["--config", "/config.yaml"]
           ports:
             - containerPort: 3000
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "1Gi"
+              cpu: "1"

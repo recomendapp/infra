@@ -23,3 +23,10 @@ spec:
           env:
             - name: IMGPROXY_ENABLE_WEBP
               value: "true"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "1Gi"
+              cpu: "1"

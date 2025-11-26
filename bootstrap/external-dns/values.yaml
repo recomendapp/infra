@@ -21,3 +21,11 @@ policy: sync
 registry: txt
 txtOwnerId: "k8s"
 interval: "1m"
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 300m
+    memory: 256Mi
