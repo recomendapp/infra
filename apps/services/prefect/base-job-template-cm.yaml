@@ -7,10 +7,13 @@ data:
   baseJobTemplate.json: |
     {
       "variables": {
-        "cpu_request":    { "type": "string", "default": "500m" },
-        "memory_request": { "type": "string", "default": "1Gi" },
-        "cpu_limit":      { "type": "string", "default": "1" },
-        "memory_limit":   { "type": "string", "default": "2Gi" }
+        "type": "object",
+        "properties": {
+          "cpu_request":    { "type": "string", "default": "500m" },
+          "memory_request": { "type": "string", "default": "1Gi" },
+          "cpu_limit":      { "type": "string", "default": "1" },
+          "memory_limit":   { "type": "string", "default": "2Gi" }
+        }
       },
       "job_configuration": {
         "job_manifest": {
