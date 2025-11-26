@@ -156,8 +156,8 @@ addons:
     enabled: true  # built-in Traefik ingress controller. Disabled by default.
 #   servicelb:
 #     enabled: false  # built-in ServiceLB. Disabled by default.
-#   metrics_server:
-#     enabled: false  # Kubernetes metrics-server addon. Disabled by default.
+  metrics_server:
+    enabled: true  # Kubernetes metrics-server addon. Disabled by default.
   cloud_controller_manager:
     enabled: true   # Hetzner Cloud Controller Manager (default true). Disabling stops automatic LB provisioning for Service objects.
   cluster_autoscaler:
