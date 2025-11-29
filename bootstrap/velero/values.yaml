@@ -1,12 +1,12 @@
 installCRDs: true
 
-resources:
-  requests:
-    cpu: 200m
-    memory: 256Mi
-  limits:
-    cpu: 500m
-    memory: 512Mi
+# resources:
+#   requests:
+#     cpu: 200m
+#     memory: 256Mi
+#   limits:
+#     cpu: 500m
+#     memory: 512Mi
 
 deployNodeAgent: true
 
@@ -45,13 +45,13 @@ nodeAgent:
   tolerations:
     - effect: NoSchedule
       operator: Exists
-  resources:
-    requests:
-      memory: 200Mi
-      cpu: 500m
-    limits:
-      memory: 1Gi
-      cpu: 1000m
+  # resources:
+  #   requests:
+  #     memory: 200Mi
+  #     cpu: 500m
+  #   limits:
+  #     memory: 1Gi
+  #     cpu: 1000m
 
 # Schedule de backup quotidien
 schedules:
