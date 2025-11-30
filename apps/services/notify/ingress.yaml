@@ -4,14 +4,14 @@ metadata:
   name: notify
   annotations:
     kubernetes.io/ingress.class: traefik
-    cert-manager.io/cluster-issuer: letsencrypt-staging
+    cert-manager.io/cluster-issuer: letsencrypt-production
 spec:
   tls:
     - hosts:
-        - notify-new.recomend.app
+        - notify.recomend.app
       secretName: notify-tls
   rules:
-    - host: notify-new.recomend.app
+    - host: notify.recomend.app
       http:
         paths:
           - path: /

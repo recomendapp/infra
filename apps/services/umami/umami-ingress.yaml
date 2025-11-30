@@ -4,14 +4,14 @@ metadata:
   name: umami
   annotations:
     kubernetes.io/ingress.class: traefik
-    cert-manager.io/cluster-issuer: letsencrypt-staging
+    cert-manager.io/cluster-issuer: letsencrypt-production
 spec:
   tls:
     - hosts:
-        - analytics-new.recomend.app
+        - analytics.recomend.app
       secretName: umami-tls
   rules:
-    - host: analytics-new.recomend.app
+    - host: analytics.recomend.app
       http:
         paths:
           - path: /
