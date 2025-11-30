@@ -3,3 +3,4 @@ resources:
 - service.yaml
 - ingress.yaml
 - secrets.yaml
+- ingress-www-redirect.yaml

@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-app-www-redirect-ingress
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/redirect-regex: "^https?://(?:www\\.)?recomend.app/(.*)"
+    traefik.ingress.kubernetes.io/redirect-replacement: "https://web.recomend.app/$1"
+    traefik.ingress.kubernetes.io/redirect-permanent: "true"
+spec:
+  rules:
+    - host: www.recomend.app
+      http:
+        paths:
+          - path: "/"
+            pathType: Prefix
+            backend:
+              service:
+                name: web-app # This backend is a placeholder, as the redirect will happen before hitting the service
+                port:
+                  number: 80

@@ -8,10 +8,11 @@ metadata:
 spec:
   tls:
     - hosts:
-        - web.recomend.app
+        - recomend.app
+        - www.recomend.app
       secretName: web-app-tls
   rules:
-    - host: web.recomend.app
+    - host: recomend.app
       http:
         paths:
           - path: /
