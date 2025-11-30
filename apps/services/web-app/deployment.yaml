@@ -30,3 +30,25 @@ spec:
           envFrom:
             - secretRef:
                 name: web-app-secret
+          volumeMounts:
+            - name: cache
+              mountPath: /app/.next/cache
+
+        - name: cache-cleaner
+          image: alpine
+          command: ["sh", "-c", "while true; do find /cache -type f -mtime +1 -delete; sleep 3600; done"]
+          volumeMounts:
+            - name: cache
+              mountPath: /cache
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "100m"
+              memory: "128Mi"
+
+      volumes:
+        - name: cache
+          emptyDir:
+            sizeLimit: "20Gi"
