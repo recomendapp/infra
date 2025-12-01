@@ -5,7 +5,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: traefik
     traefik.ingress.kubernetes.io/redirect-regex: "^https?://(?:www\\.)?recomend.app/(.*)"
-    traefik.ingress.kubernetes.io/redirect-replacement: "https://web.recomend.app/$1"
+    traefik.ingress.kubernetes.io/redirect-replacement: "https://recomend.app/$1"
     traefik.ingress.kubernetes.io/redirect-permanent: "true"
 spec:
   rules:
