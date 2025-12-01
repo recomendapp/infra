@@ -45,19 +45,6 @@ spec:
                   resize.topolvm.io/storage_limit: "50Gi"
                   resize.topolvm.io/threshold: "20%"
                   resize.topolvm.io/increase: "25%"
-      patches:
-        - target:
-            group: apps
-            version: v1
-            kind: StatefulSet
-            name: prefect-postgresql
-          patch: |-
-            $patch: strategic-merge
-            spec:
-              template:
-                metadata:
-                  annotations:
-                    backup.velero.io/backup-volumes: data
 
     - repoURL: https://prefecthq.github.io/prefect-helm
       chart: prefect-worker
