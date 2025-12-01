@@ -37,6 +37,8 @@ spec:
           postgresql:
             enabled: true
             primary:
+              podAnnotations:
+                backup.velero.io/backup-volumes: "data"
               persistence:
                 enabled: true
                 storageClass: hcloud-volumes
@@ -45,7 +47,6 @@ spec:
                   resize.topolvm.io/storage_limit: "50Gi"
                   resize.topolvm.io/threshold: "20%"
                   resize.topolvm.io/increase: "25%"
-                  backup.velero.io/backup-volumes: "data"
 
     - repoURL: https://prefecthq.github.io/prefect-helm
       chart: prefect-worker

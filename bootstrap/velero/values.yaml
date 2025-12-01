@@ -53,16 +53,16 @@ nodeAgent:
   #     memory: 1Gi
   #     cpu: 1000m
 
-# Schedule de backup quotidien
+# Schedule daily backups at 2am
 schedules:
   daily:
     disabled: false
-    schedule: "0 2 * * *"  # 2h du matin
+    schedule: "0 2 * * *"
     useOwnerReferencesInBackup: false
     template:
-      ttl: "720h"  # 30 jours
+      ttl: "720h"  # 30 days
       includedNamespaces:
         - "*"
       excludedNamespaces:
         - velero
-      defaultVolumesToFsBackup: true  # Backup des volumes dans le schedule
+      defaultVolumesToFsBackup: false
