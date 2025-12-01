@@ -23,10 +23,13 @@ spec:
           resources:
             requests:
               cpu: "200m"
-              memory: "512Mi"
+              memory: "1Gi"
             limits:
               cpu: "1"
-              memory: "1Gi"
+              memory: "2Gi"
+          env:
+            - name: NODE_OPTIONS
+              value: "--max-old-space-size=2048"
           envFrom:
             - secretRef:
                 name: web-app-secret
