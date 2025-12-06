@@ -28,6 +28,11 @@ spec:
               cpu: "1"
               memory: "1Gi"
           env:
+            - name: WEB_APP_URL
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: WEB_APP_URL
             - name: SUPABASE_URL
               valueFrom:
                 secretKeyRef:
