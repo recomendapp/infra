@@ -46,6 +46,12 @@ spec:
             - name: TYPESENSE_PROTOCOL
               value: "http"
 
+            - name: WEB_APP_URL
+              valueFrom:
+                secretKeyRef:
+                  name: prefect-secrets
+                  key: WEB_APP_URL
+
             - name: SUPABASE_URL
               valueFrom:
                 secretKeyRef:
@@ -126,6 +132,10 @@ spec:
               # Supabase Postgres Blocks
               # ---------------------
               print("Creating Supabase blocks...")
+
+              Secret(value=os.environ["WEB_APP_URL"]).save(
+                  "web-app-url", overwrite=True
+              )
 
               Secret(value=os.environ["SUPABASE_URL"]).save(
                   "supabase-url", overwrite=True
