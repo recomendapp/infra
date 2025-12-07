@@ -46,6 +46,24 @@ spec:
             - name: TYPESENSE_PROTOCOL
               value: "http"
 
+            - name: SUPABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: prefect-secrets
+                  key: SUPABASE_URL
+
+            - name: SUPABASE_ANON_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: prefect-secrets
+                  key: SUPABASE_ANON_KEY
+          
+            - name: SUPABASE_SERVICE_ROLE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: prefect-secrets
+                  key: SUPABASE_SERVICE_ROLE_KEY
+
             - name: SUPABASE_POSTGRES_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
@@ -105,16 +123,28 @@ spec:
               print("Typesense blocks created.")
 
               # ---------------------
-              # Supabase Postgres Block
+              # Supabase Postgres Blocks
               # ---------------------
-              print("Creating Supabase Postgres block...")
+              print("Creating Supabase blocks...")
+
+              Secret(value=os.environ["SUPABASE_URL"]).save(
+                  "supabase-url", overwrite=True
+              )
+
+              Secret(value=os.environ["SUPABASE_ANON_KEY"]).save(
+                  "supabase-anon-key", overwrite=True
+              )
+
+              Secret(value=os.environ["SUPABASE_SERVICE_ROLE_KEY"]).save(
+                  "supabase-service-role-key", overwrite=True
+              )
 
               Secret(value=os.environ["SUPABASE_POSTGRES_CONNECTION_STRING"]).save(
                   "postgres-connection-string",
                   overwrite=True
               )
 
-              print("Supabase block created.")
+              print("Supabase blocks created.")
 
               # ---------------------
               # TMDB Block
