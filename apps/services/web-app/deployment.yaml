@@ -27,9 +27,6 @@ spec:
             limits:
               cpu: "1"
               memory: "3Gi"
-          env:
-            - name: NODE_OPTIONS
-              value: "--max-old-space-size=2048"
           envFrom:
             - secretRef:
                 name: web-app-secret
