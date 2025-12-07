@@ -22,11 +22,11 @@ spec:
             - containerPort: 3000
           resources:
             requests:
-              cpu: "200m"
-              memory: "1Gi"
+              cpu: "500m"
+              memory: "2Gi"
             limits:
               cpu: "1"
-              memory: "2Gi"
+              memory: "3Gi"
           env:
             - name: NODE_OPTIONS
               value: "--max-old-space-size=2048"
