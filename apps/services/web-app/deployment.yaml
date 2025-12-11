@@ -45,6 +45,9 @@ spec:
             limits:
               cpu: "1"
               memory: "3Gi"
+          env:
+            - name: NODE_OPTIONS
+              value: "--dns-result-order=ipv4first"
           envFrom:
             - secretRef:
                 name: web-app-secret
