@@ -47,7 +47,7 @@ spec:
               memory: "3Gi"
           env:
             - name: NODE_OPTIONS
-              value: "--dns-result-order=ipv4first"
+              value: "--dns-result-order=ipv4first --network-family-autoselection-attempt-timeout=750"
           envFrom:
             - secretRef:
                 name: web-app-secret
