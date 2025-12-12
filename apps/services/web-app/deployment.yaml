@@ -54,6 +54,10 @@ spec:
           volumeMounts:
             - name: cache
               mountPath: /app/.next/cache
+            - name: gai-config
+              mountPath: /etc/gai.conf
+              subPath: gai.conf
+              readOnly: true
 
         - name: cache-cleaner
           image: alpine
@@ -73,3 +77,6 @@ spec:
         - name: cache
           emptyDir:
             sizeLimit: "20Gi"
+        - name: gai-config
+          configMap:
+            name: web-app-gai-config
