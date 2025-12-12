@@ -47,7 +47,7 @@ spec:
               memory: "4Gi"
           env:
             - name: NODE_OPTIONS
-              value: "--max-old-space-size=1536"
+              value: "--inspect=0.0.0.0:9229"
           #     value: "--dns-result-order=ipv4first"
           envFrom:
             - secretRef:
