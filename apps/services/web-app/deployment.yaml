@@ -16,7 +16,7 @@ spec:
         - name: github-credentials
       containers:
         - name: web-app
-          image: ghcr.io/recomendapp/web-app:20251212201351
+          image: ghcr.io/recomendapp/web-app:20251212175055
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
@@ -40,37 +40,11 @@ spec:
             successThreshold: 1
           resources:
             requests:
-              cpu: "1"
-              memory: "2Gi"
+              cpu: "500m"
+              memory: "512Mi"
             limits:
-              cpu: "2"
-              memory: "4Gi"
-          env:
-            - name: NODE_OPTIONS
-              value: "--inspect=0.0.0.0:9229"
-          #     value: "--dns-result-order=ipv4first"
+              cpu: "1"
+              memory: "1Gi"
           envFrom:
             - secretRef:
                 name: web-app-secret
-          volumeMounts:
-            - name: cache
-              mountPath: /app/.next/cache
-
-        - name: cache-cleaner
-          image: alpine
-          command: ["sh", "-c", "while true; do find /cache -type f -mtime +1 -delete; sleep 3600; done"]
-          volumeMounts:
-            - name: cache
-              mountPath: /cache
-          resources:
-            requests:
-              cpu: "50m"
-              memory: "64Mi"
-            limits:
-              cpu: "100m"
-              memory: "128Mi"
-
-      volumes:
-        - name: cache
-          emptyDir:
-            sizeLimit: "20Gi"
