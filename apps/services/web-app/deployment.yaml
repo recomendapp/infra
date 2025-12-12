@@ -40,11 +40,11 @@ spec:
             successThreshold: 1
           resources:
             requests:
-              cpu: "500m"
+              cpu: "1"
               memory: "2Gi"
             limits:
-              cpu: "1"
-              memory: "3Gi"
+              cpu: "2"
+              memory: "4Gi"
           env:
             - name: NODE_OPTIONS
               value: "--dns-result-order=ipv4first"
