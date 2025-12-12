@@ -12,6 +12,10 @@ spec:
       labels:
         app: web-app
     spec:
+      securityContext:
+        sysctls:
+        - name: net.ipv6.conf.all.disable_ipv6
+          value: "1"
       imagePullSecrets:
         - name: github-credentials
       containers:
@@ -45,9 +49,6 @@ spec:
             limits:
               cpu: "1"
               memory: "3Gi"
-          env:
-            - name: NODE_OPTIONS
-              value: "--dns-result-order=ipv4first"
           envFrom:
             - secretRef:
                 name: web-app-secret
