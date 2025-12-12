@@ -4,4 +4,3 @@ resources:
 - ingress.yaml
 - secrets.yaml
 - ingress-www-redirect.yaml
-- gai-cm.yaml

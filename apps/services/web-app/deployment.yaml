@@ -20,24 +20,24 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
-          # readinessProbe:
-          #   httpGet:
-          #     path: /api/health
-          #     port: 3000
-          #   initialDelaySeconds: 10
-          #   periodSeconds: 5
-          #   timeoutSeconds: 2
-          #   failureThreshold: 3
-          #   successThreshold: 1
-          # livenessProbe:
-          #   httpGet:
-          #     path: /api/health
-          #     port: 3000
-          #   initialDelaySeconds: 30
-          #   periodSeconds: 20
-          #   timeoutSeconds: 2
-          #   failureThreshold: 5
-          #   successThreshold: 1
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+            successThreshold: 1
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 2
+            failureThreshold: 5
+            successThreshold: 1
           resources:
             requests:
               cpu: "1"
@@ -45,38 +45,31 @@ spec:
             limits:
               cpu: "2"
               memory: "4Gi"
-          env:
-            - name: NODE_OPTIONS
-              value: "--dns-result-order=ipv4first"
+          # env:
+          #   - name: NODE_OPTIONS
+          #     value: "--dns-result-order=ipv4first"
           envFrom:
             - secretRef:
                 name: web-app-secret
           volumeMounts:
             - name: cache
               mountPath: /app/.next/cache
-            - name: gai-config
-              mountPath: /etc/gai.conf
-              subPath: gai.conf
-              readOnly: true
 
-        - name: cache-cleaner
-          image: alpine
-          command: ["sh", "-c", "while true; do find /cache -type f -mtime +1 -delete; sleep 3600; done"]
-          volumeMounts:
-            - name: cache
-              mountPath: /cache
-          resources:
-            requests:
-              cpu: "50m"
-              memory: "64Mi"
-            limits:
-              cpu: "100m"
-              memory: "128Mi"
+        # - name: cache-cleaner
+        #   image: alpine
+        #   command: ["sh", "-c", "while true; do find /cache -type f -mtime +1 -delete; sleep 3600; done"]
+        #   volumeMounts:
+        #     - name: cache
+        #       mountPath: /cache
+        #   resources:
+        #     requests:
+        #       cpu: "50m"
+        #       memory: "64Mi"
+        #     limits:
+        #       cpu: "100m"
+        #       memory: "128Mi"
 
       volumes:
         - name: cache
           emptyDir:
             sizeLimit: "20Gi"
-        - name: gai-config
-          configMap:
-            name: web-app-gai-config
