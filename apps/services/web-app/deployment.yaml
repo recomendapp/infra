@@ -40,14 +40,11 @@ spec:
             successThreshold: 1
           resources:
             requests:
-              cpu: "500m"
-              memory: "512Mi"
-            limits:
               cpu: "1"
-              memory: "1Gi"
-          # env:
-          #   - name: NODE_OPTIONS
-          #     value: "--dns-result-order=ipv4first"
+              memory: "2Gi"
+            limits:
+              cpu: "2"
+              memory: "4Gi"
           envFrom:
             - secretRef:
                 name: web-app-secret
