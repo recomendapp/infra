@@ -120,21 +120,45 @@ worker_node_pools:
   # taints:
   #   - key: something
   #     value: value1:NoSchedule
-- name: medium-autoscaled
+
+- name: medium-nbg1
   instance_type: cx33
   location: nbg1
+  labels:
+    - key: nodepool
+      value: medium
+    - key: region
+      value: nbg1
   autoscaling:
     enabled: true
     min_instances: 0
-    max_instances: 3
+    max_instances: 2
 
-- name: large-autoscaled
-  instance_type: cx43
-  location: nbg1
+- name: medium-fsn1
+  instance_type: cx33
+  location: fsn1
+  labels:
+    - key: nodepool
+      value: medium
+    - key: region
+      value: fsn1
   autoscaling:
     enabled: true
     min_instances: 0
-    max_instances: 3
+    max_instances: 2
+
+- name: medium-hel1
+  instance_type: cx33
+  location: hel1
+  labels:
+    - key: nodepool
+      value: medium
+    - key: region
+      value: hel1
+  autoscaling:
+    enabled: true
+    min_instances: 0
+    max_instances: 2
 
 # cluster_autoscaler:
 #   scan_interval: "10s"                        # How often cluster is reevaluated for scale up or down
