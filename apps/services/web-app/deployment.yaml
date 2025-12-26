@@ -49,7 +49,7 @@ spec:
               ephemeral-storage: "20Gi"
           env:
             - name: NODE_OPTIONS
-              value: "--max-old-space-size=2048"
+              value: "--max-old-space-size=2048 --dns-result-order=ipv4first"
           envFrom:
             - secretRef:
                 name: web-app-secret
