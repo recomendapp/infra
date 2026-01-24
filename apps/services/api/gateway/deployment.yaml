@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api
+  name: gateway
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: api
+      app: gateway
   template:
     metadata:
       labels:
-        app: api
+        app: gateway
     spec:
       imagePullSecrets:
         - name: github-credentials
       containers:
-        - name: api
-          image: ghcr.io/recomendapp/api:20251209221011
+        - name: gateway
+          image: ghcr.io/recomendapp/api-gateway:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
@@ -28,6 +28,8 @@ spec:
               cpu: "1"
               memory: "1Gi"
           env:
+            - name: AUTH_GRPC_URL
+              value: "auth:50051"
             - name: WEB_APP_URL
               valueFrom:
                 secretKeyRef:
