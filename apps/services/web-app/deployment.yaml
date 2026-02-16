@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   name: web-app
 spec:
-  replicas: 1
   strategy:
     type: Recreate
   selector:
@@ -16,35 +15,28 @@ spec:
     spec:
       imagePullSecrets:
         - name: github-credentials
-      hostAliases:
-        - ip: "188.114.97.3"
-          hostnames:
-            - "supabase.recomend.app"
-        - ip: "188.114.96.3"
-          hostnames:
-            - "supabase.recomend.app"
       containers:
         - name: web-app
           image: ghcr.io/recomendapp/web-app:20260116142258
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
-          # readinessProbe:
-          #   httpGet:
-          #     path: /api/health
-          #     port: 3000
-          #   initialDelaySeconds: 30
-          #   periodSeconds: 15
-          #   timeoutSeconds: 10
-          #   failureThreshold: 3
-          # livenessProbe:
-          #   httpGet:
-          #     path: /api/health
-          #     port: 3000
-          #   initialDelaySeconds: 120
-          #   periodSeconds: 30
-          #   timeoutSeconds: 15
-          #   failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 120
+            periodSeconds: 30
+            timeoutSeconds: 15
+            failureThreshold: 3
           resources:
             requests:
               cpu: "1"
@@ -55,8 +47,6 @@ spec:
           env:
             - name: NODE_OPTIONS
               value: "--max-old-space-size=2048 --dns-result-order=ipv4first"
-            - name: NODE_DEBUG
-              value: "net"
           envFrom:
             - secretRef:
                 name: web-app-secret
