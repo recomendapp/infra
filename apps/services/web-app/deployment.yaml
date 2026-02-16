@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: web-app
 spec:
+  replicas: 1
   strategy:
     type: Recreate
   selector:
@@ -26,9 +27,9 @@ spec:
               path: /api/health
               port: 3000
             initialDelaySeconds: 30
-            periodSeconds: 10
-            timeoutSeconds: 15
-            failureThreshold: 6
+            periodSeconds: 15
+            timeoutSeconds: 10
+            failureThreshold: 3
           livenessProbe:
             httpGet:
               path: /api/health
@@ -39,20 +40,20 @@ spec:
             failureThreshold: 3
           resources:
             requests:
-              cpu: "500m"
-              memory: "512Mi"
+              cpu: "1"
+              memory: "2Gi"
             limits:
               cpu: "2"
-              memory: "2Gi"
+              memory: "4Gi"
           env:
             - name: NODE_OPTIONS
-              value: "--max-old-space-size=1536 --dns-result-order=ipv4first"
+              value: "--max-old-space-size=2048 --dns-result-order=ipv4first"
           envFrom:
             - secretRef:
                 name: web-app-secret
-          volumeMounts:
-            - name: cache
-              mountPath: /app/.next/cache
+          # volumeMounts:
+          #   - name: cache
+          #     mountPath: /app/.next/cache
 
         # - name: cache-cleaner
         #   image: alpine
@@ -68,7 +69,7 @@ spec:
         #       cpu: "100m"
         #       memory: "128Mi"
 
-      volumes:
-        - name: cache
-          emptyDir:
-            sizeLimit: "20Gi"
+      # volumes:
+      #   - name: cache
+      #     emptyDir:
+      #       sizeLimit: "20Gi"
