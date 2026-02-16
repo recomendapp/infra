@@ -16,6 +16,10 @@ spec:
     spec:
       imagePullSecrets:
         - name: github-credentials
+      hostAliases:
+        - ip: "188.114.97.3"
+          hostnames:
+            - "supabase.recomend.app"
       containers:
         - name: web-app
           image: ghcr.io/recomendapp/web-app:20260116142258
