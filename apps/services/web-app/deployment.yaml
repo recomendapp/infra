@@ -25,28 +25,28 @@ spec:
             httpGet:
               path: /api/health
               port: 3000
-            initialDelaySeconds: 15
+            initialDelaySeconds: 30
             periodSeconds: 10
-            timeoutSeconds: 5
+            timeoutSeconds: 15
             failureThreshold: 6
           livenessProbe:
             httpGet:
               path: /api/health
               port: 3000
-            initialDelaySeconds: 60
-            periodSeconds: 20
-            timeoutSeconds: 5
-            failureThreshold: 5
+            initialDelaySeconds: 120
+            periodSeconds: 30
+            timeoutSeconds: 15
+            failureThreshold: 3
           resources:
             requests:
-              cpu: "1"
-              memory: "2Gi"
+              cpu: "250m"
+              memory: "512Mi"
             limits:
               cpu: "2"
-              memory: "4Gi"
+              memory: "2Gi"
           env:
             - name: NODE_OPTIONS
-              value: "--max-old-space-size=2048 --dns-result-order=ipv4first --network-family-autoselection-attempt-timeout=2000"
+              value: "--max-old-space-size=1536 --dns-result-order=ipv4first"
           envFrom:
             - secretRef:
                 name: web-app-secret
