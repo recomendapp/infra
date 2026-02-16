@@ -49,15 +49,13 @@ spec:
             - name: NODE_OPTIONS
               value: "--max-old-space-size=2048 --dns-result-order=ipv4first"
             - name: NODE_DEBUG
-              value: "net,http,https"
-            - name: NEXT_PUBLIC_FETCH_FAMILY
-              value: "4"
+              value: "net"
           envFrom:
             - secretRef:
                 name: web-app-secret
-          # volumeMounts:
-          #   - name: cache
-          #     mountPath: /app/.next/cache
+          volumeMounts:
+            - name: cache
+              mountPath: /app/.next/cache
 
         # - name: cache-cleaner
         #   image: alpine
@@ -73,7 +71,7 @@ spec:
         #       cpu: "100m"
         #       memory: "128Mi"
 
-      # volumes:
-      #   - name: cache
-      #     emptyDir:
-      #       sizeLimit: "20Gi"
+      volumes:
+        - name: cache
+          emptyDir:
+            sizeLimit: "20Gi"
