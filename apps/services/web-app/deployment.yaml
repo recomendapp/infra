@@ -50,6 +50,8 @@ spec:
               value: "--max-old-space-size=2048 --dns-result-order=ipv4first"
             - name: NODE_DEBUG
               value: "net,http,https"
+            - name: NEXT_PUBLIC_FETCH_FAMILY
+              value: "4"
           envFrom:
             - secretRef:
                 name: web-app-secret
