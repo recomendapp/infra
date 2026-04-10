@@ -13,7 +13,7 @@ spec:
           restartPolicy: OnFailure
           containers:
             - name: pg-backup
-              image: bitnami/postgresql:16
+              image: postgres:16-alpine
               env:
                 # --- Database Credentials ---
                 - name: PG_USER
@@ -52,21 +52,18 @@ spec:
                   value: "recomend-backups"
 
               command:
-                - /bin/bash
+                - /bin/sh
                 - -c
                 - |
                   echo "⏳ Starting Umami PostgreSQL backup..."
                   
-                  # Install AWS CLI to stream the upload to R2
-                  install_packages aws-cli > /dev/null
+                  apk add --no-cache aws-cli > /dev/null
                   
                   DATE=$(date +"%Y-%m-%d_%H-%M-%S")
                   FILENAME="umami-backup-${DATE}.sql.gz"
                   
-                  # Store the backup in a dedicated subfolder on R2
                   S3_PATH="s3://${S3_BUCKET}/umami-postgres/${FILENAME}"
                   
-                  # Execute a streaming compressed dump directly to R2 (Z 9 = max compression)
                   pg_dump "${DATABASE_URL}" -Z 9 | aws s3 cp - "${S3_PATH}" --endpoint-url="${S3_ENDPOINT}"
                   
                   if [ $? -eq 0 ]; then
