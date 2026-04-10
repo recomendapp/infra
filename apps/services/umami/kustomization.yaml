@@ -6,4 +6,5 @@ resources:
 - umami-ingress.yaml
 - umami-secret.yaml
 - umami-service.yaml
+- r2-secret.yaml
 - cronjob-backup.yaml
