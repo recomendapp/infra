@@ -10,8 +10,6 @@ spec:
       app: minio
   template:
     metadata:
-      annotations:
-        backup.velero.io/backup-volumes: minio-data
       labels:
         app: minio
     spec:

@@ -66,7 +66,6 @@ spec:
                   DATE=$(date +"%Y-%m-%d_%H-%M-%S")
                   FILENAME="main-db-backup-${DATE}.sql.gz"
                   
-                  # Folder name in R2: "main-postgres"
                   S3_PATH="s3://${S3_BUCKET}/main-postgres/${FILENAME}"
                   
                   pg_dump "${DATABASE_URL}" -Z 9 | aws s3 cp - "${S3_PATH}" --endpoint-url="${S3_ENDPOINT}"

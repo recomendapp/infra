@@ -1,0 +1,66 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: minio-backup
+spec:
+  schedule: "0 4 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: minio-mirror
+              image: minio/mc:latest
+              env:
+                - name: LOCAL_MINIO_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: minio-secret
+                      key: MINIO_ROOT_USER
+                - name: LOCAL_MINIO_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: minio-secret
+                      key: MINIO_ROOT_PASSWORD
+                
+                - name: R2_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: minio-r2-secret
+                      key: AWS_ACCESS_KEY_ID
+                - name: R2_SECRET_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: minio-r2-secret
+                      key: AWS_SECRET_ACCESS_KEY
+                - name: R2_BUCKET
+                  valueFrom:
+                    secretKeyRef:
+                      name: minio-r2-secret
+                      key: S3_BUCKET
+                - name: R2_ENDPOINT
+                  valueFrom:
+                    secretKeyRef:
+                      name: minio-r2-secret
+                      key: S3_ENDPOINT
+
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  echo "⏳ Starting MinIO Mirror to Cloudflare R2..."
+                  
+                  mc alias set local http://minio:9000 "$LOCAL_MINIO_USER" "$LOCAL_MINIO_PASSWORD"
+                  mc alias set backup "$R2_ENDPOINT" "$R2_ACCESS_KEY" "$R2_SECRET_KEY"
+                  
+                  mc mirror --overwrite local/ backup/"$R2_BUCKET"/minio-data/
+                  
+                  if [ $? -eq 0 ]; then
+                    echo "✅ MinIO mirror successful!"
+                  else
+                    echo "❌ MinIO mirror failed"
+                    exit 1
+                  fi
