@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notify
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notify
+  template:
+    metadata:
+      labels:
+        app: notify
+    spec:
+      imagePullSecrets:
+        - name: github-credentials
+      containers:
+        - name: notify
+          image: ghcr.io/recomendapp/notify:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9001
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          env:
+            # --- Base Configuration ---
+            - name: NODE_ENV
+              value: "production"
+            - name: LOG_LEVEL
+              value: "info"
+            - name: WEB_APP_URL
+              value: "https://recomend.app"
+
+            # --- Internal Services (k3s DNS) ---
+            - name: REDIS_HOST
+              value: "redis"
+            - name: REDIS_PORT
+              value: "6379"
+
+            # --- Secrets from ExternalSecret ---
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: notify-secret
+                  key: REDIS_PASSWORD
+            
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: notify-secret
+                  key: DATABASE_URL
+
+            - name: RESEND_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: notify-secret
+                  key: RESEND_API_KEY
+            - name: RESEND_FROM_EMAIL
+              value: "Recomend <hello@recomend.app>"
+
+            - name: FIREBASE_PROJECT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: notify-secret
+                  key: FIREBASE_PROJECT_ID
+            - name: FIREBASE_CLIENT_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: notify-secret
+                  key: FIREBASE_CLIENT_EMAIL
+            - name: FIREBASE_PRIVATE_KEY_B64
+              valueFrom:
+                secretKeyRef:
+                  name: notify-secret
+                  key: FIREBASE_PRIVATE_KEY_B64
+
+            - name: APNS_KEY_B64
+              valueFrom:
+                secretKeyRef:
+                  name: notify-secret
+                  key: APNS_KEY_B64
+            - name: APNS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: notify-secret
+                  key: APNS_KEY_ID
+            - name: APNS_TEAM_ID
+              valueFrom:
+                secretKeyRef:
+                  name: notify-secret
+                  key: APNS_TEAM_ID

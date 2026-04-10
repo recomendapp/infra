@@ -52,29 +52,23 @@ spec:
                   name: prefect-secrets
                   key: WEB_APP_URL
 
-            - name: SUPABASE_URL
+            - name: PG_USER
               valueFrom:
                 secretKeyRef:
                   name: prefect-secrets
-                  key: SUPABASE_URL
-
-            - name: SUPABASE_ANON_KEY
+                  key: POSTGRES_USER
+            - name: PG_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: prefect-secrets
-                  key: SUPABASE_ANON_KEY
-          
-            - name: SUPABASE_SERVICE_ROLE_KEY
+                  key: POSTGRES_PASSWORD
+            - name: PG_DB
               valueFrom:
                 secretKeyRef:
                   name: prefect-secrets
-                  key: SUPABASE_SERVICE_ROLE_KEY
-
-            - name: SUPABASE_POSTGRES_CONNECTION_STRING
-              valueFrom:
-                secretKeyRef:
-                  name: prefect-secrets
-                  key: SUPABASE_POSTGRES_CONNECTION_STRING
+                  key: POSTGRES_DB
+            - name: POSTGRES_CONNECTION_STRING
+              value: "postgresql://$(PG_USER):$(PG_PASSWORD)@postgres.default.svc.cluster.local:5432/$(PG_DB)"
 
             - name: TMDB_API_KEYS
               valueFrom:
@@ -129,32 +123,19 @@ spec:
               print("Typesense blocks created.")
 
               # ---------------------
-              # Supabase Postgres Blocks
+              # Web App URL
               # ---------------------
-              print("Creating Supabase blocks...")
+              Secret(value=os.environ["WEB_APP_URL"]).save("web-app-url", overwrite=True)
 
-              Secret(value=os.environ["WEB_APP_URL"]).save(
-                  "web-app-url", overwrite=True
-              )
-
-              Secret(value=os.environ["SUPABASE_URL"]).save(
-                  "supabase-url", overwrite=True
-              )
-
-              Secret(value=os.environ["SUPABASE_ANON_KEY"]).save(
-                  "supabase-anon-key", overwrite=True
-              )
-
-              Secret(value=os.environ["SUPABASE_SERVICE_ROLE_KEY"]).save(
-                  "supabase-service-role-key", overwrite=True
-              )
-
-              Secret(value=os.environ["SUPABASE_POSTGRES_CONNECTION_STRING"]).save(
+              # ---------------------
+              # Postgres DB Block
+              # ---------------------
+              print("Creating Postgres block...")
+              Secret(value=os.environ["POSTGRES_CONNECTION_STRING"]).save(
                   "postgres-connection-string",
                   overwrite=True
               )
-
-              print("Supabase blocks created.")
+              print("Postgres block created.")
 
               # ---------------------
               # TMDB Block
