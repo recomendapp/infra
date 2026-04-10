@@ -1,0 +1,77 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: umami-postgres-backup
+spec:
+  schedule: "30 3 * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: pg-backup
+              image: bitnami/postgresql:16
+              env:
+                # --- Database Credentials ---
+                - name: PG_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: umami-postgres-secret
+                      key: POSTGRES_USER
+                - name: PG_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: umami-postgres-secret
+                      key: POSTGRES_PASSWORD
+                - name: PG_DB
+                  valueFrom:
+                    secretKeyRef:
+                      name: umami-postgres-secret
+                      key: POSTGRES_DB
+                      
+                - name: DATABASE_URL
+                  value: "postgresql://$(PG_USER):$(PG_PASSWORD)@umami-postgres:5432/$(PG_DB)"
+                
+                # --- S3 / Cloudflare R2 Credentials ---
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: velero-credentials 
+                      key: AWS_ACCESS_KEY_ID
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: velero-credentials
+                      key: AWS_SECRET_ACCESS_KEY
+                - name: S3_ENDPOINT
+                  value: "https://c960e9a51b5b0decbfee92d753e153b0.r2.cloudflarestorage.com"
+                - name: S3_BUCKET
+                  value: "recomend-backups"
+
+              command:
+                - /bin/bash
+                - -c
+                - |
+                  echo "⏳ Starting Umami PostgreSQL backup..."
+                  
+                  # Install AWS CLI to stream the upload to R2
+                  install_packages aws-cli > /dev/null
+                  
+                  DATE=$(date +"%Y-%m-%d_%H-%M-%S")
+                  FILENAME="umami-backup-${DATE}.sql.gz"
+                  
+                  # Store the backup in a dedicated subfolder on R2
+                  S3_PATH="s3://${S3_BUCKET}/umami-postgres/${FILENAME}"
+                  
+                  # Execute a streaming compressed dump directly to R2 (Z 9 = max compression)
+                  pg_dump "${DATABASE_URL}" -Z 9 | aws s3 cp - "${S3_PATH}" --endpoint-url="${S3_ENDPOINT}"
+                  
+                  if [ $? -eq 0 ]; then
+                    echo "✅ Backup successful: ${S3_PATH}"
+                  else
+                    echo "❌ Backup failed"
+                    exit 1
+                  fi

@@ -10,9 +10,6 @@ spec:
       app: typesense
   template:
     metadata:
-      # Typesense data can be rebuilded if lost (from main database)
-      # annotations:
-      #   backup.velero.io/backup-volumes: data
       labels:
         app: typesense
     spec:
