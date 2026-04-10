@@ -1,0 +1,79 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: main-postgres-backup
+spec:
+  schedule: "0 3 * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: pg-backup
+              image: postgres:18.3-alpine
+              env:
+                - name: PG_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-secret
+                      key: POSTGRES_USER
+                - name: PG_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-secret
+                      key: POSTGRES_PASSWORD
+                - name: PG_DB
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-secret
+                      key: POSTGRES_DB
+                      
+                - name: DATABASE_URL
+                  value: "postgresql://$(PG_USER):$(PG_PASSWORD)@postgres:5432/$(PG_DB)"
+                
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-r2-secret
+                      key: AWS_ACCESS_KEY_ID
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-r2-secret
+                      key: AWS_SECRET_ACCESS_KEY
+                - name: S3_BUCKET
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-r2-secret
+                      key: S3_BUCKET
+                - name: S3_ENDPOINT
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-r2-secret
+                      key: S3_ENDPOINT
+
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  echo "⏳ Starting Main PostgreSQL backup..."
+                  
+                  apk add --no-cache aws-cli > /dev/null
+                  
+                  DATE=$(date +"%Y-%m-%d_%H-%M-%S")
+                  FILENAME="main-db-backup-${DATE}.sql.gz"
+                  
+                  # Folder name in R2: "main-postgres"
+                  S3_PATH="s3://${S3_BUCKET}/main-postgres/${FILENAME}"
+                  
+                  pg_dump "${DATABASE_URL}" -Z 9 | aws s3 cp - "${S3_PATH}" --endpoint-url="${S3_ENDPOINT}"
+                  
+                  if [ $? -eq 0 ]; then
+                    echo "✅ Backup successful: ${S3_PATH}"
+                  else
+                    echo "❌ Backup failed"
+                    exit 1
+                  fi

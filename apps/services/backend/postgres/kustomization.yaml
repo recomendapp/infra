@@ -2,3 +2,5 @@ resources:
   - secret.yaml
   - service.yaml
   - statefulset.yaml
+  - backup-secret.yaml
+  - backup-cronjob.yaml
