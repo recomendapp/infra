@@ -15,6 +15,7 @@ configuration:
     - name: default
       provider: aws
       bucket: "recomend-backups"
+      prefix: "velero"
       config:
         region: auto
         s3ForcePathStyle: "true"
