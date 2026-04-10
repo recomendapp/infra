@@ -39,17 +39,23 @@ spec:
                 - name: AWS_ACCESS_KEY_ID
                   valueFrom:
                     secretKeyRef:
-                      name: velero-credentials 
+                      name: umami-r2-secret
                       key: AWS_ACCESS_KEY_ID
                 - name: AWS_SECRET_ACCESS_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: velero-credentials
+                      name: umami-r2-secret
                       key: AWS_SECRET_ACCESS_KEY
-                - name: S3_ENDPOINT
-                  value: "https://c960e9a51b5b0decbfee92d753e153b0.r2.cloudflarestorage.com"
                 - name: S3_BUCKET
-                  value: "recomend-backups"
+                  valueFrom:
+                    secretKeyRef:
+                      name: umami-r2-secret
+                      key: S3_BUCKET
+                - name: S3_ENDPOINT
+                  valueFrom:
+                    secretKeyRef:
+                      name: umami-r2-secret
+                      key: S3_ENDPOINT
 
               command:
                 - /bin/sh
