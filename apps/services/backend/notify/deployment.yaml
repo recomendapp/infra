@@ -44,18 +44,30 @@ spec:
             - name: REDIS_PORT
               value: "6379"
 
+            - name: PG_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_USER
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+            - name: PG_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_DB
+            - name: DATABASE_URL
+              value: "postgresql://$(PG_USER):$(PG_PASSWORD)@postgres:5432/$(PG_DB)"
+
             # --- Secrets from ExternalSecret ---
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: notify-secret
+                  name: redis-secret
                   key: REDIS_PASSWORD
-            
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: notify-secret
-                  key: DATABASE_URL
 
             - name: RESEND_API_KEY
               valueFrom:

@@ -16,7 +16,7 @@ spec:
       containers:
       - name: minio
         image: minio/minio:RELEASE.2025-09-07T16-13-09Z
-        command: ["server", "/data", "--console-address", ":9001"]
+        args: ["server", "/data", "--console-address", ":9001"]
         envFrom:
           - secretRef:
               name: minio-secret
