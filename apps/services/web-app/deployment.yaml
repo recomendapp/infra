@@ -21,29 +21,29 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
-          readinessProbe:
-            httpGet:
-              path: /api/health
-              port: 3000
-            initialDelaySeconds: 30
-            periodSeconds: 15
-            timeoutSeconds: 10
-            failureThreshold: 3
-          livenessProbe:
-            httpGet:
-              path: /api/health
-              port: 3000
-            initialDelaySeconds: 120
-            periodSeconds: 30
-            timeoutSeconds: 15
-            failureThreshold: 3
-          resources:
-            requests:
-              cpu: "1"
-              memory: "2Gi"
-            limits:
-              cpu: "2"
-              memory: "4Gi"
+          # readinessProbe:
+          #   httpGet:
+          #     path: /api/health
+          #     port: 3000
+          #   initialDelaySeconds: 30
+          #   periodSeconds: 15
+          #   timeoutSeconds: 10
+          #   failureThreshold: 3
+          # livenessProbe:
+          #   httpGet:
+          #     path: /api/health
+          #     port: 3000
+          #   initialDelaySeconds: 120
+          #   periodSeconds: 30
+          #   timeoutSeconds: 15
+          #   failureThreshold: 3
+          # resources:
+          #   requests:
+          #     cpu: "1"
+          #     memory: "2Gi"
+          #   limits:
+          #     cpu: "2"
+          #     memory: "4Gi"
           env:
             - name: NODE_OPTIONS
               value: "--max-old-space-size=2048 --dns-result-order=ipv4first"
