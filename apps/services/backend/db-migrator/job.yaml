@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-migrator
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  template:
+    spec:
+      imagePullSecrets:
+        - name: github-credentials
+      containers:
+        - name: migrator
+          image: ghcr.io/recomendapp/db-migrator:latest
+          imagePullPolicy: Always
+          env:
+            - name: PG_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_USER
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+            - name: PG_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_DB
+            - name: DATABASE_URL
+              value: "postgresql://$(PG_USER):$(PG_PASSWORD)@postgres:5432/$(PG_DB)"
+      restartPolicy: Never
+  backoffLimit: 4

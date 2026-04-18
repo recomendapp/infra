@@ -1,0 +1,130 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      imagePullSecrets:
+        - name: github-credentials
+      containers:
+        - name: api
+          image: ghcr.io/recomendapp/api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9000
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+          env:
+            # --- Base Configuration ---
+            - name: NODE_ENV
+              value: "production"
+            - name: LOG_LEVEL
+              value: "info"
+            - name: PORT
+              value: "9000"
+            - name: HOST
+              value: "0.0.0.0"
+            - name: WEB_APP_URL
+              value: "https://recomend.app"
+            - name: API_URL
+              value: "https://api.recomend.app"
+            - name: MOBILE_APP_SCHEME
+              value: "recomend://"
+
+            # --- Database Construction (via postgres-secret) ---
+            - name: PG_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_USER
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+            - name: PG_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_DB
+            - name: DATABASE_URL
+              value: "postgresql://$(PG_USER):$(PG_PASSWORD)@postgres:5432/$(PG_DB)"
+
+            # --- Redis (via redis-secret) ---
+            - name: REDIS_HOST
+              value: "redis"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: REDIS_PASSWORD
+
+            # --- Typesense (via typesense-secret) ---
+            - name: TYPESENSE_HOST
+              value: "typesense"
+            - name: TYPESENSE_PORT
+              value: "8108"
+            - name: TYPESENSE_PROTOCOL
+              value: "http"
+            - name: TYPESENSE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: typesense-secret
+                  key: TYPESENSE_API_KEY
+
+            # --- MinIO / S3 (via minio-secret) ---
+            - name: S3_ENDPOINT
+              value: "http://minio:9000"
+            - name: S3_REGION
+              value: "eu-west-1"
+            - name: S3_PUBLIC_ENDPOINT
+              value: "https://medias.recomend.app"
+            - name: S3_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: S3_BUCKET
+            - name: S3_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: MINIO_ROOT_USER
+            - name: S3_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: MINIO_ROOT_PASSWORD
+
+            # --- Auth & OAuth ---
+            - name: AUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: AUTH_SECRET
+            - name: AUTH_GITHUB_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: AUTH_GITHUB_CLIENT_ID
+            - name: AUTH_GITHUB_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: AUTH_GITHUB_CLIENT_SECRET

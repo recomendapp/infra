@@ -1,0 +1,8 @@
+resources:
+  - secret.yaml
+  - service.yaml
+  - statefulset.yaml
+  - setup-job.yaml
+  - ingress.yaml
+  - backup-secret.yaml
+  - backup-cronjob.yaml

@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minio-setup
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  template:
+    spec:
+      containers:
+      - name: mc
+        image: minio/mc:latest
+        envFrom:
+          - secretRef:
+              name: minio-secret
+        command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Waiting for MinIO to be healthy..."
+          until curl -s -f http://minio:9000/minio/health/live; do
+            sleep 2;
+          done;
+          echo "MinIO is ready. Configuring..."
+          mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD}
+          if ! mc ls myminio/${S3_BUCKET} > /dev/null 2>&1; then
+            echo "Creating bucket ${S3_BUCKET}..."
+            mc mb myminio/${S3_BUCKET}
+            mc anonymous set download myminio/${S3_BUCKET}
+            echo "Bucket ${S3_BUCKET} created and set to public read."
+          else
+            echo "Bucket ${S3_BUCKET} already exists."
+          fi
+      restartPolicy: Never

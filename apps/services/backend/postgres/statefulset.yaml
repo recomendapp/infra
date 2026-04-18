@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:18.3
+        envFrom:
+          - secretRef:
+              name: postgres-secret
+        env:
+          - name: PGDATA
+            value: /var/lib/postgresql/data/pgdata
+        ports:
+          - containerPort: 5432
+            name: postgres
+        volumeMounts:
+          - name: postgres-data
+            mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "1000m"
+          limits:
+            memory: "8Gi"
+            cpu: "2000m"
+        livenessProbe:
+          exec:
+            command: ["sh", "-c", "pg_isready -U $POSTGRES_USER"]
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command: ["sh", "-c", "pg_isready -U $POSTGRES_USER"]
+          initialDelaySeconds: 5
+          periodSeconds: 5
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-data
+      annotations:
+        resize.topolvm.io/storage_limit: "50Gi"
+        resize.topolvm.io/threshold: "20%"
+        resize.topolvm.io/increase: "25%"
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: hcloud-volumes
+      resources:
+        requests:
+          storage: 20Gi
