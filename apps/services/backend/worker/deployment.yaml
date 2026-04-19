@@ -55,7 +55,7 @@ spec:
                   name: postgres-secret
                   key: POSTGRES_DB
             - name: DATABASE_URL
-              value: "postgresql://$(PG_USER):$(PG_PASSWORD)@postgres:5432/$(PG_DB)"
+              value: "postgresql://$(PG_USER):$(PG_PASSWORD)@postgres:5432/$(PG_DB)?sslmode=disable"
 
             # --- Redis (via redis-secret) ---
             - name: REDIS_HOST
