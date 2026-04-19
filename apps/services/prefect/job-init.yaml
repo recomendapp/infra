@@ -68,7 +68,7 @@ spec:
                   name: prefect-secrets
                   key: POSTGRES_DB
             - name: POSTGRES_CONNECTION_STRING
-              value: "postgresql://$(PG_USER):$(PG_PASSWORD)@postgres.default.svc.cluster.local:5432/$(PG_DB)"
+              value: "postgresql://$(PG_USER):$(PG_PASSWORD)@postgres.backend.svc.cluster.local:5432/$(PG_DB)"
 
             - name: TMDB_API_KEYS
               valueFrom:
