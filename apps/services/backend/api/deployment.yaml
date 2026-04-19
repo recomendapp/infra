@@ -113,6 +113,11 @@ spec:
                   key: MINIO_ROOT_PASSWORD
 
             # --- Auth & OAuth ---
+            - name: AUTH_COOKIE_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: AUTH_COOKIE_DOMAIN
             - name: AUTH_SECRET
               valueFrom:
                 secretKeyRef:
