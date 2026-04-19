@@ -18,12 +18,14 @@ spec:
         - /bin/sh
         - -c
         - |
-          echo "Waiting for MinIO to be healthy..."
-          until curl -s -f http://minio:9000/minio/health/live; do
+          echo "Waiting for MinIO to be reachable..."
+          until mc alias set myminio http://minio:9000 "${MINIO_ROOT_USER}" "${MINIO_ROOT_PASSWORD}"; do
+            echo "MinIO not reachable yet, retrying in 2s..."
             sleep 2;
           done;
-          echo "MinIO is ready. Configuring..."
-          mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD}
+
+          echo "MinIO is ready. Configuring bucket..."
+          
           if ! mc ls myminio/${S3_BUCKET} > /dev/null 2>&1; then
             echo "Creating bucket ${S3_BUCKET}..."
             mc mb myminio/${S3_BUCKET}
