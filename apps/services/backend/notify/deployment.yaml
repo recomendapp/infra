@@ -108,3 +108,8 @@ spec:
                 secretKeyRef:
                   name: notify-secret
                   key: APNS_TEAM_ID
+            - name: APNS_BUNDLE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: notify-secret
+                  key: APNS_BUNDLE_ID
