@@ -133,3 +133,13 @@ spec:
                 secretKeyRef:
                   name: api-secret
                   key: AUTH_GITHUB_CLIENT_SECRET
+            - name: AUTH_FACEBOOK_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: AUTH_FACEBOOK_CLIENT_ID
+            - name: AUTH_FACEBOOK_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: AUTH_FACEBOOK_CLIENT_SECRET
