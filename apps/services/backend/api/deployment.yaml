@@ -123,6 +123,16 @@ spec:
                 secretKeyRef:
                   name: api-secret
                   key: AUTH_SECRET
+            - name: AUTH_GOOGLE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: AUTH_GOOGLE_CLIENT_ID
+            - name: AUTH_GOOGLE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: AUTH_GOOGLE_CLIENT_SECRET
             - name: AUTH_GITHUB_CLIENT_ID
               valueFrom:
                 secretKeyRef:
@@ -143,3 +153,28 @@ spec:
                 secretKeyRef:
                   name: api-secret
                   key: AUTH_FACEBOOK_CLIENT_SECRET
+            - name: AUTH_APPLE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: AUTH_APPLE_CLIENT_ID
+            - name: AUTH_APPLE_TEAM_ID
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: AUTH_APPLE_TEAM_ID
+            - name: AUTH_APPLE_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: AUTH_APPLE_KEY_ID
+            - name: AUTH_APPLE_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: AUTH_APPLE_PRIVATE_KEY
+            - name: AUTH_APPLE_BUNDLE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: AUTH_APPLE_BUNDLE_ID
