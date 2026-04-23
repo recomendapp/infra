@@ -180,6 +180,11 @@ spec:
                   key: AUTH_APPLE_BUNDLE_ID
             
             # --- RevenueCat ---
+            - name: REVENUECAT_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: REVENUECAT_API_KEY
             - name: REVENUECAT_WEBHOOK_SECRET
               valueFrom:
                 secretKeyRef:
