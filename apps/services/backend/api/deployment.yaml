@@ -128,6 +128,16 @@ spec:
                 secretKeyRef:
                   name: api-secret
                   key: AUTH_GOOGLE_CLIENT_ID
+            - name: AUTH_GOOGLE_IOS_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: AUTH_GOOGLE_IOS_CLIENT_ID
+            - name: AUTH_GOOGLE_ANDROID_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: AUTH_GOOGLE_ANDROID_CLIENT_ID
             - name: AUTH_GOOGLE_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
