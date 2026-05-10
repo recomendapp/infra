@@ -3,9 +3,9 @@ kind: Job
 metadata:
   name: prefect-init
   namespace: prefect
-  # annotations:
-  #   argocd.argoproj.io/hook: PostSync
-  #   argocd.argoproj.io/hook-delete-policy: HookSucceeded
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
 
 spec:
   backoffLimit: 0
@@ -75,6 +75,24 @@ spec:
                 secretKeyRef:
                   name: prefect-secrets
                   key: TMDB_API_KEYS
+
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: prefect-secrets
+                  key: S3_ACCESS_KEY
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: prefect-secrets
+                  key: S3_SECRET_KEY
+            - name: S3_SITEMAPS_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: prefect-secrets
+                  key: S3_SITEMAPS_BUCKET
+            - name: S3_ENDPOINT
+              value: "http://minio.backend.svc.cluster.local:9000"
 
           command:
             - /bin/sh
@@ -148,6 +166,16 @@ spec:
               )
 
               print("TMDB block created.")
+
+              # ---------------------
+              # S3 / MinIO Blocks
+              # ---------------------
+              print("Creating S3 / MinIO blocks...")
+              Secret(value=os.environ["S3_ENDPOINT"]).save("s3-endpoint", overwrite=True)
+              Secret(value=os.environ["S3_ACCESS_KEY"]).save("s3-access-key", overwrite=True)
+              Secret(value=os.environ["S3_SECRET_KEY"]).save("s3-secret-key", overwrite=True)
+              Secret(value=os.environ["S3_SITEMAPS_BUCKET"]).save("s3-sitemap-bucket", overwrite=True)
+              print("S3 blocks created.")
 
               print("Init job completed successfully.")
               EOF
