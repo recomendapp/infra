@@ -8,7 +8,7 @@ spec:
     kind: Deployment
     name: web-app
   minReplicas: 1
-  maxReplicas: 2
+  maxReplicas: 4
   metrics:
   - type: Resource
     resource:
