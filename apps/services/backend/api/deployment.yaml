@@ -5,7 +5,6 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "3"
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: api
@@ -24,8 +23,8 @@ spec:
             - containerPort: 9000
           resources:
             requests:
-              cpu: "200m"
-              memory: "256Mi"
+              cpu: "500m"
+              memory: "512Mi"
             limits:
               cpu: "1"
               memory: "1Gi"

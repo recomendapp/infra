@@ -4,7 +4,7 @@ metadata:
   name: web-app
 spec:
   strategy:
-    type: Recreate
+    type: RollingUpdate
   selector:
     matchLabels:
       app: web-app
@@ -37,13 +37,13 @@ spec:
           #   periodSeconds: 30
           #   timeoutSeconds: 15
           #   failureThreshold: 3
-          # resources:
-          #   requests:
-          #     cpu: "1"
-          #     memory: "2Gi"
-          #   limits:
-          #     cpu: "2"
-          #     memory: "4Gi"
+          resources:
+            requests:
+              cpu: "1"
+              memory: "2Gi"
+            limits:
+              cpu: "2"
+              memory: "4Gi"
           env:
             - name: NODE_OPTIONS
               value: "--max-old-space-size=2048 --dns-result-order=ipv4first"
