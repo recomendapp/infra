@@ -131,8 +131,8 @@ worker_node_pools:
       value: nbg1
   autoscaling:
     enabled: true
-    min_instances: 0
-    max_instances: 2
+    min_instances: 1
+    max_instances: 4
 
 - name: medium-fsn1
   instance_type: cx33
@@ -144,8 +144,8 @@ worker_node_pools:
       value: fsn1
   autoscaling:
     enabled: true
-    min_instances: 0
-    max_instances: 2
+    min_instances: 1
+    max_instances: 4
 
 - name: medium-hel1
   instance_type: cx33
