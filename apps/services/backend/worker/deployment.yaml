@@ -18,7 +18,7 @@ spec:
         - name: github-credentials
       containers:
         - name: worker
-          image: ghcr.io/recomendapp/worker:b41-c1d568e
+          image: ghcr.io/recomendapp/worker:b44-49dcc4f
           imagePullPolicy: Always
           ports:
             - containerPort: 9002
