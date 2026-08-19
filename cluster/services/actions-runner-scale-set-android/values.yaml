@@ -17,6 +17,14 @@ maxRunners: 3
 runnerScaleSetName: infra-android-heavy
 
 template:
+  metadata:
+    annotations:
+      # cluster-autoscaler killed the underlying Hetzner VM mid-job once
+      # (node "does not exist in the cloud provider" while a job was
+      # actively running on it), which the runner reported as "lost
+      # communication with the server". This stops the autoscaler from
+      # ever considering a node unneeded while this pod is running on it.
+      cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
   spec:
     imagePullSecrets:
       - name: github-credentials
