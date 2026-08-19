@@ -63,7 +63,9 @@ RUN curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-l
 
 ENV PATH=/opt/node/bin:${PATH}
 
-RUN npm install -g pnpm@${PNPM_VERSION}
+RUN npm install -g pnpm@${PNPM_VERSION} \
+    && corepack enable \
+    && corepack prepare yarn@stable --activate
 
 # ---------- Android SDK + NDK + cmake, copied from react-native-community/docker-android ----------
 ENV ANDROID_HOME=/opt/android
@@ -96,4 +98,4 @@ RUN chown -R runner:runner /opt/android /opt/react-native-downloads /opt/node /o
 USER runner
 
 # Fail the build immediately if any tool is broken, instead of on the first real job.
-RUN java -version && node -v && pnpm -v && sdkmanager --version && eas --version
+RUN java -version && node -v && pnpm -v && yarn -v && sdkmanager --version && eas --version
