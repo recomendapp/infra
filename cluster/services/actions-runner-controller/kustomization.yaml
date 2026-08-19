@@ -3,6 +3,15 @@ kind: Kustomization
 
 namespace: arc-systems
 
+# `helm template` (what kustomize's helmCharts inflation uses under the hood)
+# silently skips a chart's crds/ folder — only `helm install`/`upgrade` apply
+# it automatically. Vendored here so ArgoCD actually creates them.
+resources:
+  - crds/actions.github.com_autoscalinglisteners.yaml
+  - crds/actions.github.com_autoscalingrunnersets.yaml
+  - crds/actions.github.com_ephemeralrunners.yaml
+  - crds/actions.github.com_ephemeralrunnersets.yaml
+
 helmCharts:
   - name: gha-runner-scale-set-controller
     repo: oci://ghcr.io/actions/actions-runner-controller-charts

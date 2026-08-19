@@ -1,6 +1,16 @@
 githubConfigUrl: "https://github.com/recomendapp/app"
 githubConfigSecret: arc-github-app-credentials
 
+# The chart normally auto-discovers the controller's ServiceAccount via a
+# Helm `lookup()` against the live cluster. ArgoCD renders via `helm template`
+# (no live cluster access at render time), so lookup() returns nothing and
+# the chart errors out unless this is set explicitly. Name follows the
+# controller's release name from cluster/services/actions-runner-controller
+# (releaseName: arc-controller -> <releaseName>-gha-rs-controller).
+controllerServiceAccount:
+  namespace: arc-systems
+  name: arc-controller-gha-rs-controller
+
 minRunners: 0
 maxRunners: 3
 
