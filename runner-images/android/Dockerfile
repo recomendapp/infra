@@ -63,9 +63,10 @@ RUN curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-l
 
 ENV PATH=/opt/node/bin:${PATH}
 
-RUN npm install -g pnpm@${PNPM_VERSION} \
-    && corepack enable \
-    && corepack prepare yarn@stable --activate
+# Plain npm install, not corepack: corepack (as bundled with this Node
+# version) fails signature verification against npm's rotated registry
+# signing key ("Cannot find matching keyid").
+RUN npm install -g pnpm@${PNPM_VERSION} yarn
 
 # ---------- Android SDK + NDK + cmake, copied from react-native-community/docker-android ----------
 ENV ANDROID_HOME=/opt/android
