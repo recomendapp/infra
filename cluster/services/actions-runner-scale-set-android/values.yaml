@@ -22,7 +22,7 @@ template:
       - name: github-credentials
     containers:
       - name: runner
-        image: ghcr.io/recomendapp/runner-android:latest
+        image: ghcr.io/recomendapp/runner-android:sha-05c4dc9
         command: ["/home/runner/run.sh"]
         env:
           - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
