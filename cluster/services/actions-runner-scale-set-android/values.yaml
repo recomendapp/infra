@@ -44,8 +44,16 @@ template:
         env:
           - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
             value: "false"
-        # CX43 = 8 vCPU / 16Gi total. Leaves ~1 vCPU / ~2Gi headroom for
-        # daemonsets/system on top of the request.
+          # Same recipe EAS Build's own "medium" cloud workers use (confirmed
+          # via docs.expo.dev/build-reference/infrastructure): GRADLE_OPTS
+          # overrides gradle.properties' org.gradle.jvmargs, so this works
+          # regardless of what expo prebuild regenerates in android/.
+          # org.gradle.daemon=false is the important bit: our OOM
+          # ("RMI TCP Connection(idle)" OutOfMemoryError: Metaspace) was
+          # thrown by the Gradle daemon's own idle-monitor thread — with the
+          # daemon disabled that failure mode can't happen at all.
+          - name: GRADLE_OPTS
+            value: "-Dorg.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8 -Dorg.gradle.daemon=false -Dorg.gradle.parallel=true"
         resources:
           requests:
             cpu: "6"
