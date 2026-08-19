@@ -1,4 +1,5 @@
 ---
+config_format_version: 1
 hetzner_token: ${HCLOUD_TOKEN}
 cluster_name: recomend
 kubeconfig_path: "./kubeconfig"
