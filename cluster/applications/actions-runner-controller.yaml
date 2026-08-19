@@ -20,3 +20,7 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      # ARC's CRDs embed a full PodSpec schema; client-side apply's
+      # last-applied-configuration annotation overflows the 262144-byte
+      # limit. Server-side apply avoids that annotation entirely.
+      - ServerSideApply=true
