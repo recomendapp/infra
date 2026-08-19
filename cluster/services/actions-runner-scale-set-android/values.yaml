@@ -27,12 +27,16 @@ template:
         env:
           - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
             value: "false"
+        # Biggest node in the fleet is a Hetzner CX33 (4 vCPU / ~7.5Gi
+        # allocatable) — requests must fit under that with headroom for
+        # daemonsets, or the pod is permanently unschedulable (no node type
+        # in any pool is bigger, so cluster-autoscaler can't help either).
         resources:
           requests:
-            cpu: "4"
-            memory: 8Gi
+            cpu: "3"
+            memory: 6Gi
             ephemeral-storage: 20Gi
           limits:
-            cpu: "8"
-            memory: 16Gi
+            cpu: "4"
+            memory: 7Gi
             ephemeral-storage: 40Gi
