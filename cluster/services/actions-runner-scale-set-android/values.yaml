@@ -26,6 +26,15 @@ template:
       # ever considering a node unneeded while this pod is running on it.
       cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
   spec:
+    # Dedicated CX43 pool (hetzner/cluster_config.yaml: large-android) —
+    # keeps this pricier/bigger node type from ever being used for anything
+    # but this runner, and vice versa (nothing else can land on it).
+    nodeSelector:
+      nodepool: large-android
+    tolerations:
+      - key: dedicated
+        value: android-runner
+        effect: NoSchedule
     imagePullSecrets:
       - name: github-credentials
     containers:
@@ -35,16 +44,14 @@ template:
         env:
           - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
             value: "false"
-        # Biggest node in the fleet is a Hetzner CX33 (4 vCPU / ~7.5Gi
-        # allocatable) — requests must fit under that with headroom for
-        # daemonsets, or the pod is permanently unschedulable (no node type
-        # in any pool is bigger, so cluster-autoscaler can't help either).
+        # CX43 = 8 vCPU / 16Gi total. Leaves ~1 vCPU / ~2Gi headroom for
+        # daemonsets/system on top of the request.
         resources:
           requests:
-            cpu: "3"
-            memory: 6Gi
+            cpu: "6"
+            memory: 12Gi
             ephemeral-storage: 20Gi
           limits:
-            cpu: "4"
-            memory: 7Gi
+            cpu: "7"
+            memory: 14Gi
             ephemeral-storage: 40Gi

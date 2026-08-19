@@ -160,6 +160,27 @@ worker_node_pools:
     min_instances: 0
     max_instances: 2
 
+# Dedicated to the ARC android-heavy CI runner (Gradle/NDK builds need more
+# headroom than a CX33 can give). Tainted so nothing else ever lands here —
+# without the taint, a small unrelated pending pod could trigger a scale-up
+# of this (pricier) pool instead of medium-*, since cluster-autoscaler picks
+# whichever node group can fit the pod. Only pods with a matching toleration
+# (see cluster/services/actions-runner-scale-set-android/values.yaml) can be
+# scheduled here.
+- name: large-android
+  instance_type: cx43
+  location: fsn1
+  labels:
+    - key: nodepool
+      value: large-android
+  taints:
+    - key: dedicated
+      value: android-runner:NoSchedule
+  autoscaling:
+    enabled: true
+    min_instances: 0
+    max_instances: 3
+
 # cluster_autoscaler:
 #   scan_interval: "10s"                        # How often cluster is reevaluated for scale up or down
 #   scale_down_delay_after_add: "10m"           # How long after scale up that scale down evaluation resumes
