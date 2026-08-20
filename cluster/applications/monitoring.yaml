@@ -70,6 +70,8 @@ spec:
                         storage: 20Gi
           alertmanager:
             alertmanagerSpec:
+              secrets:
+                - monitoring-secrets
               resources:
                 requests:
                   cpu: 100m
@@ -77,6 +79,24 @@ spec:
                 limits:
                   cpu: 500m
                   memory: 512Mi
+            config:
+              global:
+                resolve_timeout: 5m
+              route:
+                group_by: ['namespace', 'alertname']
+                group_wait: 30s
+                group_interval: 5m
+                repeat_interval: 12h
+                receiver: discord-webhook
+                routes:
+                  - receiver: 'null'
+                    matchers:
+                      - alertname = "Watchdog"
+              receivers:
+                - name: 'null'
+                - name: discord-webhook
+                  discord_configs:
+                    - webhook_url_file: /etc/alertmanager/secrets/monitoring-secrets/ALERTMANAGER_DISCORD_WEBHOOK_URL
           kube-state-metrics:
             resources:
               requests:
