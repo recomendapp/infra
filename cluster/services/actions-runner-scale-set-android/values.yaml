@@ -20,6 +20,8 @@ listenerTemplate:
   spec:
     nodeSelector:
       kubernetes.io/hostname: recomend-pool-small-static-worker1
+    containers:
+      - name: listener
 
 template:
   metadata:
