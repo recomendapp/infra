@@ -32,7 +32,7 @@ data:
             "name": "deployment",
             "type": "query",
             "label": "App",
-            "query": "label_values(kube_deployment_labels{namespace=\"$namespace\"}, deployment)",
+            "query": "label_values(kube_deployment_status_replicas{namespace=\"$namespace\"}, deployment)",
             "refresh": 2,
             "sort": 1
           }

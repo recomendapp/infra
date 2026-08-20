@@ -13,6 +13,10 @@ spec:
       targetRevision: 79.7.1
       helm:
         valuesObject:
+          defaultRules:
+            rules:
+              kubeProxy: false
+              kubeSchedulerAlerting: false
           grafana:
             enabled: true
             admin:
