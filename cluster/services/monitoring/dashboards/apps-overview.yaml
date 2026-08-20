@@ -1,0 +1,181 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: apps-overview-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  apps-overview.json: |-
+    {
+      "title": "Recomend - Apps Overview",
+      "uid": "recomend-apps-overview",
+      "timezone": "browser",
+      "schemaVersion": 16,
+      "version": 1,
+      "refresh": "30s",
+      "time": { "from": "now-6h", "to": "now" },
+      "templating": {
+        "list": [
+          {
+            "name": "namespace",
+            "type": "custom",
+            "label": "Namespace",
+            "query": "backend,default",
+            "current": { "text": "backend", "value": "backend" },
+            "options": [
+              { "text": "backend", "value": "backend", "selected": true },
+              { "text": "default", "value": "default", "selected": false }
+            ]
+          },
+          {
+            "name": "deployment",
+            "type": "query",
+            "label": "App",
+            "query": "label_values(kube_deployment_labels{namespace=\"$namespace\"}, deployment)",
+            "refresh": 2,
+            "sort": 1
+          }
+        ]
+      },
+      "panels": [
+        {
+          "title": "Desired Replicas",
+          "type": "stat",
+          "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+          "targets": [
+            {
+              "expr": "kube_deployment_spec_replicas{namespace=\"$namespace\",deployment=\"$deployment\"}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "title": "Available Replicas",
+          "type": "stat",
+          "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "red", "value": null },
+                  { "color": "green", "value": 1 }
+                ]
+              }
+            }
+          },
+          "targets": [
+            {
+              "expr": "kube_deployment_status_replicas_available{namespace=\"$namespace\",deployment=\"$deployment\"}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "title": "Restarts (1h)",
+          "type": "stat",
+          "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "orange", "value": 1 },
+                  { "color": "red", "value": 5 }
+                ]
+              }
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"$namespace\",pod=~\"$deployment-.*\"}[1h]))",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "title": "HPA: Current vs Max Replicas",
+          "type": "stat",
+          "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+          "targets": [
+            {
+              "expr": "kube_horizontalpodautoscaler_status_current_replicas{namespace=\"$namespace\",horizontalpodautoscaler=\"$deployment\"}",
+              "legendFormat": "current",
+              "refId": "A"
+            },
+            {
+              "expr": "kube_horizontalpodautoscaler_spec_max_replicas{namespace=\"$namespace\",horizontalpodautoscaler=\"$deployment\"}",
+              "legendFormat": "max",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "title": "CPU Usage per Pod",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+          "fieldConfig": { "defaults": { "unit": "short" } },
+          "targets": [
+            {
+              "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\",pod=~\"$deployment-.*\",container!=\"\",container!=\"POD\"}[5m])) by (pod)",
+              "legendFormat": "{{pod}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "title": "Memory Usage per Pod",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+          "fieldConfig": { "defaults": { "unit": "bytes" } },
+          "targets": [
+            {
+              "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\",pod=~\"$deployment-.*\",container!=\"\",container!=\"POD\"}) by (pod)",
+              "legendFormat": "{{pod}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "title": "CPU Request/Limit Utilization",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+          "fieldConfig": { "defaults": { "unit": "percentunit", "max": 1, "min": 0 } },
+          "targets": [
+            {
+              "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"$namespace\",pod=~\"$deployment-.*\",container!=\"\",container!=\"POD\"}[5m])) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\",pod=~\"$deployment-.*\",resource=\"cpu\"})",
+              "legendFormat": "CPU % of limit",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "title": "Memory Request/Limit Utilization",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+          "fieldConfig": { "defaults": { "unit": "percentunit", "max": 1, "min": 0 } },
+          "targets": [
+            {
+              "expr": "sum(container_memory_working_set_bytes{namespace=\"$namespace\",pod=~\"$deployment-.*\",container!=\"\",container!=\"POD\"}) / sum(kube_pod_container_resource_limits{namespace=\"$namespace\",pod=~\"$deployment-.*\",resource=\"memory\"})",
+              "legendFormat": "Memory % of limit",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "title": "Pod Status",
+          "type": "table",
+          "gridPos": { "h": 6, "w": 24, "x": 0, "y": 20 },
+          "targets": [
+            {
+              "expr": "kube_pod_status_phase{namespace=\"$namespace\",pod=~\"$deployment-.*\",phase=\"Running\"} == 1",
+              "format": "table",
+              "instant": true,
+              "refId": "A"
+            }
+          ]
+        }
+      ]
+    }
