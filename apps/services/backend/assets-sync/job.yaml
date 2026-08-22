@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: assets-sync
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  template:
+    spec:
+      imagePullSecrets:
+        - name: github-credentials
+      containers:
+        - name: assets-sync
+          image: ghcr.io/recomendapp/assets:latest
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: minio-secret
+      restartPolicy: Never
+  backoffLimit: 4

@@ -38,6 +38,15 @@ spec:
             - name: WEB_APP_URL
               value: "https://recomend.app"
 
+            # --- Static assets (MinIO/S3, see libs/assets in the app repo) ---
+            - name: S3_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: S3_BUCKET
+            - name: ASSETS_BASE_URL
+              value: "https://medias.recomend.app/$(S3_BUCKET)/static"
+
             # --- Internal Services (k3s DNS) ---
             - name: REDIS_HOST
               value: "redis"
