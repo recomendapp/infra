@@ -43,4 +43,12 @@ spec:
           else
             echo "Bucket ${S3_SITEMAPS_BUCKET} already exists."
           fi
+
+          if ! mc ls myminio/${S3_IMPORTS_BUCKET} > /dev/null 2>&1; then
+            echo "Creating bucket ${S3_IMPORTS_BUCKET}..."
+            mc mb myminio/${S3_IMPORTS_BUCKET}
+            echo "Bucket ${S3_IMPORTS_BUCKET} created (private — no anonymous access, holds user import/export files)."
+          else
+            echo "Bucket ${S3_IMPORTS_BUCKET} already exists."
+          fi
       restartPolicy: Never

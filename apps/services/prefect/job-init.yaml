@@ -91,8 +91,21 @@ spec:
                 secretKeyRef:
                   name: prefect-secrets
                   key: S3_SITEMAPS_BUCKET
+            - name: S3_IMPORTS_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: prefect-secrets
+                  key: S3_IMPORTS_BUCKET
             - name: S3_ENDPOINT
               value: "http://minio.backend.svc.cluster.local:9000"
+
+            - name: API_INTERNAL_URL
+              value: "http://api.backend.svc.cluster.local"
+            - name: API_INTERNAL_IMPORTS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: prefect-secrets
+                  key: API_INTERNAL_IMPORTS_SECRET
 
           command:
             - /bin/sh
@@ -175,7 +188,16 @@ spec:
               Secret(value=os.environ["S3_ACCESS_KEY"]).save("s3-access-key", overwrite=True)
               Secret(value=os.environ["S3_SECRET_KEY"]).save("s3-secret-key", overwrite=True)
               Secret(value=os.environ["S3_SITEMAPS_BUCKET"]).save("s3-sitemap-bucket", overwrite=True)
+              Secret(value=os.environ["S3_IMPORTS_BUCKET"]).save("s3-imports-bucket", overwrite=True)
               print("S3 blocks created.")
+
+              # ---------------------
+              # Imports/exports blocks (see db-sync/import_transfer)
+              # ---------------------
+              print("Creating import blocks...")
+              Secret(value=os.environ["API_INTERNAL_URL"]).save("api-internal-url", overwrite=True)
+              Secret(value=os.environ["API_INTERNAL_IMPORTS_SECRET"]).save("api-internal-imports-secret", overwrite=True)
+              print("Import blocks created.")
 
               print("Init job completed successfully.")
               EOF
