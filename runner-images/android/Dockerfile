@@ -16,7 +16,7 @@ FROM ghcr.io/actions/actions-runner:latest
 
 USER root
 
-ARG NODE_VERSION=20.18.1
+ARG NODE_VERSION=24.19.0
 ARG PNPM_VERSION=9.15.0
 
 # curl/unzip/ca-certificates: needed for the manual downloads below.
