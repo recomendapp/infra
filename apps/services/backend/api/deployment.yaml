@@ -114,6 +114,8 @@ spec:
                 secretKeyRef:
                   name: minio-secret
                   key: S3_BUCKET
+            - name: ASSETS_BASE_URL
+              value: "https://medias.recomend.app/$(S3_BUCKET)/static"
             - name: S3_IMPORTS_BUCKET
               valueFrom:
                 secretKeyRef:
