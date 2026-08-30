@@ -19,7 +19,7 @@ spec:
         - name: github-credentials
       containers:
       - name: postgres
-        image: ghcr.io/recomendapp/postgres:b63-b954b8b
+        image: ghcr.io/recomendapp/postgres:b68-522e0ea
         envFrom:
           - secretRef:
               name: postgres-secret
