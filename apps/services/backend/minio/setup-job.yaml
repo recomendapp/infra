@@ -10,7 +10,11 @@ spec:
     spec:
       containers:
       - name: mc
-        image: minio/mc:latest
+        # minio/mc no longer exists on Docker Hub (see statefulset.yaml).
+        # This is a PostSync hook — it runs on every ArgoCD sync of the
+        # backend app, not just minio changes, so a dead image here blocks
+        # every future deploy, not just minio's own.
+        image: quay.io/minio/mc:latest
         envFrom:
           - secretRef:
               name: minio-secret

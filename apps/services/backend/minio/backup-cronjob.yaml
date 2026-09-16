@@ -13,7 +13,10 @@ spec:
           restartPolicy: OnFailure
           containers:
             - name: minio-mirror
-              image: minio/mc:latest
+              # minio/mc no longer exists on Docker Hub — see
+              # statefulset.yaml. Without this the nightly R2 backup
+              # silently stops working at the next scheduled run.
+              image: quay.io/minio/mc:latest
               env:
                 - name: LOCAL_MINIO_USER
                   valueFrom:
