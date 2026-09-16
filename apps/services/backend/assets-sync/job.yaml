@@ -15,7 +15,7 @@ spec:
           # TODO(rustfs-migration): bump this tag once the app repo's RustFS
           # prep PR is merged and CD has rebuilt — this pinned tag's entrypoint
           # still defaults S3_ENDPOINT to minio:9000, not rustfs:9000.
-          image: ghcr.io/recomendapp/assets:b96-8de3dd5
+          image: ghcr.io/recomendapp/assets:b97-665e662
           imagePullPolicy: Always
           envFrom:
             - secretRef:
