@@ -1,0 +1,13 @@
+resources:
+  - secret.yaml
+  - service.yaml
+  - statefulset.yaml
+  - setup-job.yaml
+  - backup-secret.yaml
+  - backup-cronjob.yaml
+  # ingress.yaml intentionally NOT wired in yet: it claims the same host
+  # (medias.recomend.app) as minio/ingress.yaml, and both can't be applied at
+  # once. Add it here — and remove minio/ingress.yaml from
+  # ../minio/kustomization.yaml in the same change — only at actual cutover
+  # time, once apps/services/backend/rustfs/migrate-job.yaml has verified
+  # object counts match. See the migration runbook.
