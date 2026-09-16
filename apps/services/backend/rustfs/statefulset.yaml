@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rustfs
+spec:
+  serviceName: rustfs
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rustfs
+  template:
+    metadata:
+      labels:
+        app: rustfs
+    spec:
+      containers:
+      - name: rustfs
+        image: rustfs/rustfs:1.0.0-alpha.86
+        env:
+          - name: RUSTFS_VOLUMES
+            value: /data/rustfs0
+          - name: RUSTFS_ADDRESS
+            value: "0.0.0.0:9000"
+          - name: RUSTFS_CONSOLE_ENABLE
+            value: "true"
+          - name: RUSTFS_CONSOLE_ADDRESS
+            value: "0.0.0.0:9001"
+        envFrom:
+          - secretRef:
+              name: rustfs-secret
+        ports:
+          - containerPort: 9000
+          - containerPort: 9001
+        volumeMounts:
+          - name: rustfs-data
+            mountPath: /data
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 9000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 9000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+  volumeClaimTemplates:
+  - metadata:
+      name: rustfs-data
+      annotations:
+        resize.topolvm.io/storage_limit: "100Gi"
+        resize.topolvm.io/threshold: "20%"
+        resize.topolvm.io/increase: "25%"
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: hcloud-volumes
+      resources:
+        requests:
+          storage: 20Gi

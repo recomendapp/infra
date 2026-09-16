@@ -12,10 +12,13 @@ spec:
         - name: github-credentials
       containers:
         - name: assets-sync
+          # TODO(rustfs-migration): bump this tag once the app repo's RustFS
+          # prep PR is merged and CD has rebuilt — this pinned tag's entrypoint
+          # still defaults S3_ENDPOINT to minio:9000, not rustfs:9000.
           image: ghcr.io/recomendapp/assets:b97-665e662
           imagePullPolicy: Always
           envFrom:
             - secretRef:
-                name: minio-secret
+                name: rustfs-secret
       restartPolicy: Never
   backoffLimit: 4
