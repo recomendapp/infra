@@ -15,7 +15,12 @@ spec:
     spec:
       containers:
       - name: minio
-        image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+        # minio/minio was pulled from Docker Hub entirely (repository no
+        # longer exists). This exact release still exists on quay.io (MinIO's
+        # own recommended mirror) — without this, any pod restart (crash,
+        # eviction, node upgrade) fails to pull and this StatefulSet cannot
+        # recover.
+        image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
         args: ["server", "/data", "--console-address", ":9001"]
         envFrom:
           - secretRef:
