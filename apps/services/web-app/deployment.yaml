@@ -17,7 +17,7 @@ spec:
         - name: github-credentials
       containers:
         - name: web-app
-          image: ghcr.io/recomendapp/web:b98-130158b
+          image: ghcr.io/recomendapp/web:b100-f99287c
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
