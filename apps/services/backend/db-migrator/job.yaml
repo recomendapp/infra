@@ -13,7 +13,7 @@ spec:
         - name: github-credentials
       containers:
         - name: migrator
-          image: ghcr.io/recomendapp/db:b106-2159258
+          image: ghcr.io/recomendapp/db:b111-e7f8cc4
           imagePullPolicy: Always
           env:
             - name: PG_USER

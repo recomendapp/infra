@@ -18,7 +18,7 @@ spec:
         - name: github-credentials
       containers:
         - name: notify
-          image: ghcr.io/recomendapp/notify:b106-2159258
+          image: ghcr.io/recomendapp/notify:b111-e7f8cc4
           imagePullPolicy: Always
           ports:
             - containerPort: 9001
