@@ -18,7 +18,7 @@ spec:
         - name: github-credentials
       containers:
         - name: notify
-          image: ghcr.io/recomendapp/notify:b97-665e662
+          image: ghcr.io/recomendapp/notify:b111-e7f8cc4
           imagePullPolicy: Always
           ports:
             - containerPort: 9001
@@ -38,15 +38,15 @@ spec:
             - name: WEB_APP_URL
               value: "https://recomend.app"
 
-            # --- Static assets (RustFS/S3, see libs/assets in the app repo) ---
+            # --- Static assets (MinIO/S3, see libs/assets in the app repo) ---
             - name: S3_ENDPOINT
-              value: "http://rustfs:9000"
+              value: "http://minio:9000"
             - name: S3_PUBLIC_ENDPOINT
               value: "https://medias.recomend.app"
             - name: S3_BUCKET
               valueFrom:
                 secretKeyRef:
-                  name: rustfs-secret
+                  name: minio-secret
                   key: S3_BUCKET
             - name: ASSETS_BASE_URL
               value: "https://medias.recomend.app/$(S3_BUCKET)/static"

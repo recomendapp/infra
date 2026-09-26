@@ -97,7 +97,7 @@ spec:
                   name: prefect-secrets
                   key: S3_IMPORTS_BUCKET
             - name: S3_ENDPOINT
-              value: "http://rustfs.backend.svc.cluster.local:9000"
+              value: "http://minio.backend.svc.cluster.local:9000"
 
             - name: API_INTERNAL_URL
               value: "http://api.backend.svc.cluster.local"
@@ -181,9 +181,9 @@ spec:
               print("TMDB block created.")
 
               # ---------------------
-              # S3 / RustFS Blocks
+              # S3 / MinIO Blocks
               # ---------------------
-              print("Creating S3 / RustFS blocks...")
+              print("Creating S3 / MinIO blocks...")
               Secret(value=os.environ["S3_ENDPOINT"]).save("s3-endpoint", overwrite=True)
               Secret(value=os.environ["S3_ACCESS_KEY"]).save("s3-access-key", overwrite=True)
               Secret(value=os.environ["S3_SECRET_KEY"]).save("s3-secret-key", overwrite=True)
