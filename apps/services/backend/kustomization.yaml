@@ -2,12 +2,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  # TODO(rustfs-migration): remove `minio` once the cutover to `rustfs` is
-  # verified in prod and the rollback window has passed — see the migration
-  # runbook. Both stacks are listed here on purpose during the transition:
-  # minio keeps serving live traffic until consumers below are switched over,
-  # and its data must stay reachable for apps/services/backend/rustfs/migrate-job.yaml.
-  - minio
   - rustfs
   - assets-sync
   - postgres
