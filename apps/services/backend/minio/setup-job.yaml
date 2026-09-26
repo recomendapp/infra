@@ -10,11 +10,11 @@ spec:
     spec:
       containers:
       - name: mc
-        # minio/mc no longer exists on Docker Hub (see statefulset.yaml).
-        # This is a PostSync hook — it runs on every ArgoCD sync of the
-        # backend app, not just minio changes, so a dead image here blocks
-        # every future deploy, not just minio's own.
-        image: quay.io/minio/mc:latest
+        # MinIO no longer distributes mc images (Docker Hub removed, quay.io
+        # now 401). This is a PostSync hook — it runs on every ArgoCD sync of
+        # the backend app, so a dead image here blocks every future deploy.
+        # Chainguard's build is maintained; -dev ships the shell. Pinned by digest.
+        image: cgr.dev/chainguard/minio-client@sha256:f0dd93b48af1f8a641edcd3c64661c8dbe05189bd2ef2f8cea216eb18af10bf8
         envFrom:
           - secretRef:
               name: minio-secret
