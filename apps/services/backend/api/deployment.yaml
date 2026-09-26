@@ -17,7 +17,7 @@ spec:
         - name: github-credentials
       containers:
         - name: api
-          image: ghcr.io/recomendapp/api:b117-ebd32b6
+          image: ghcr.io/recomendapp/api:b119-b477600
           imagePullPolicy: Always
           ports:
             - containerPort: 9000
