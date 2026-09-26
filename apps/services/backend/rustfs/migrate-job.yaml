@@ -1,0 +1,90 @@
+# One-off data migration: copies every object from the live MinIO StatefulSet
+# to the live RustFS StatefulSet, bucket by bucket. NOT part of
+# kustomization.yaml on purpose — run by hand during the cutover, while both
+# `minio` and `rustfs` Services are reachable in-cluster.
+#
+# Safe to run more than once: without --overwrite, `rc mirror` only copies
+# objects missing on RustFS, so a second run right after the cutover picks up
+# anything written to MinIO in between without clobbering newer RustFS
+# objects. Never deletes anything on either side.
+#
+# Usage:
+#   kubectl apply -n backend -f apps/services/backend/rustfs/migrate-job.yaml
+#   kubectl logs -n backend job/rustfs-migrate -f
+#   kubectl delete -n backend -f apps/services/backend/rustfs/migrate-job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rustfs-migrate
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: rc
+          image: rustfs/rc@sha256:ab024bfebee49a750ce886b4c70963ccd9ddaa03f491704a90710641d7a26699
+          env:
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: MINIO_ROOT_USER
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: MINIO_ROOT_PASSWORD
+            - name: S3_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: rustfs-secret
+                  key: S3_ACCESS_KEY_ID
+            - name: S3_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: rustfs-secret
+                  key: S3_SECRET_ACCESS_KEY
+            - name: S3_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: rustfs-secret
+                  key: S3_BUCKET
+            - name: S3_SITEMAPS_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: rustfs-secret
+                  key: S3_SITEMAPS_BUCKET
+            - name: S3_IMPORTS_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: rustfs-secret
+                  key: S3_IMPORTS_BUCKET
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -eu
+              rc alias set miniosrc http://minio:9000 "${MINIO_ROOT_USER}" "${MINIO_ROOT_PASSWORD}"
+              rc alias set rustfsdst http://rustfs:9000 "${S3_ACCESS_KEY_ID}" "${S3_SECRET_ACCESS_KEY}"
+
+              # Buckets and their anonymous policies are created by rustfs-setup.
+              for bucket in "${S3_BUCKET}" "${S3_SITEMAPS_BUCKET}" "${S3_IMPORTS_BUCKET}"; do
+                echo "=== Mirroring ${bucket}: minio -> rustfs ==="
+                rc mirror "miniosrc/${bucket}/" "rustfsdst/${bucket}/"
+              done
+
+              # Every MinIO object must exist identically on RustFS. Objects only
+              # on RustFS are fine (new uploads after the cutover).
+              failed=0
+              for bucket in "${S3_BUCKET}" "${S3_SITEMAPS_BUCKET}" "${S3_IMPORTS_BUCKET}"; do
+                summary=$(rc diff --recursive "miniosrc/${bucket}/" "rustfsdst/${bucket}/" | grep '^Summary:' || true)
+                echo "${bucket}: ${summary}"
+                case "${summary}" in
+                  *" 0 different, 0 only in first,"*) ;;
+                  *) echo "MISMATCH on ${bucket}, investigate before cutting over."; failed=1 ;;
+                esac
+              done
+              [ "${failed}" -eq 0 ]
+
+              echo "Migration complete, every MinIO object is on RustFS."

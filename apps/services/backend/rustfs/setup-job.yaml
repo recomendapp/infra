@@ -1,0 +1,44 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rustfs-setup
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  # PostSync hook: if RustFS never comes up, fail instead of waiting forever
+  # and blocking every later backend sync.
+  activeDeadlineSeconds: 600
+  backoffLimit: 0
+  template:
+    spec:
+      containers:
+      - name: rc
+        image: rustfs/rc@sha256:ab024bfebee49a750ce886b4c70963ccd9ddaa03f491704a90710641d7a26699
+        envFrom:
+          - secretRef:
+              name: rustfs-secret
+        command:
+        - /bin/sh
+        - -c
+        - |
+          set -eu
+          echo "Waiting for RustFS to be reachable..."
+          until rc alias set myrustfs http://rustfs:9000 "${S3_ACCESS_KEY_ID}" "${S3_SECRET_ACCESS_KEY}"; do
+            echo "RustFS not reachable yet, retrying in 2s..."
+            sleep 2;
+          done;
+
+          echo "RustFS is ready. Configuring buckets..."
+
+          rc bucket create --ignore-existing myrustfs/${S3_BUCKET}
+          rc bucket anonymous set download myrustfs/${S3_BUCKET}
+          echo "Bucket ${S3_BUCKET} ready and set to public read."
+
+          rc bucket create --ignore-existing myrustfs/${S3_SITEMAPS_BUCKET}
+          rc bucket anonymous set download myrustfs/${S3_SITEMAPS_BUCKET}
+          echo "Bucket ${S3_SITEMAPS_BUCKET} ready and set to public read."
+
+          rc bucket create --ignore-existing myrustfs/${S3_IMPORTS_BUCKET}
+          echo "Bucket ${S3_IMPORTS_BUCKET} ready (private — no anonymous access, holds user import/export files)."
+      restartPolicy: Never
