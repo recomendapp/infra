@@ -10,7 +10,7 @@ spec:
     spec:
       containers:
       - name: rc
-        image: rustfs/rc:latest
+        image: rustfs/rc@sha256:ab024bfebee49a750ce886b4c70963ccd9ddaa03f491704a90710641d7a26699
         envFrom:
           - secretRef:
               name: rustfs-secret
@@ -18,6 +18,7 @@ spec:
         - /bin/sh
         - -c
         - |
+          set -eu
           echo "Waiting for RustFS to be reachable..."
           until rc alias set myrustfs http://rustfs:9000 "${S3_ACCESS_KEY_ID}" "${S3_SECRET_ACCESS_KEY}"; do
             echo "RustFS not reachable yet, retrying in 2s..."

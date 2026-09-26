@@ -1,8 +1,12 @@
-# One-off data migration: copies every existing object from the live MinIO
-# StatefulSet to the live RustFS StatefulSet, bucket by bucket. NOT part of
-# kustomization.yaml on purpose — this must only run once, by hand, during the
-# cutover window described in the migration runbook, while both `minio` and
-# `rustfs` Services are reachable in-cluster at the same time.
+# One-off data migration: copies every object from the live MinIO StatefulSet
+# to the live RustFS StatefulSet, bucket by bucket. NOT part of
+# kustomization.yaml on purpose — run by hand during the cutover, while both
+# `minio` and `rustfs` Services are reachable in-cluster.
+#
+# Safe to run more than once: without --overwrite, `rc mirror` only copies
+# objects missing on RustFS, so a second run right after the cutover picks up
+# anything written to MinIO in between without clobbering newer RustFS
+# objects. Never deletes anything on either side.
 #
 # Usage:
 #   kubectl apply -n backend -f apps/services/backend/rustfs/migrate-job.yaml
@@ -13,13 +17,13 @@ kind: Job
 metadata:
   name: rustfs-migrate
 spec:
-  backoffLimit: 2
+  backoffLimit: 0
   template:
     spec:
       restartPolicy: Never
       containers:
-        - name: mc
-          image: quay.io/minio/mc:latest
+        - name: rc
+          image: rustfs/rc@sha256:ab024bfebee49a750ce886b4c70963ccd9ddaa03f491704a90710641d7a26699
           env:
             - name: MINIO_ROOT_USER
               valueFrom:
@@ -61,28 +65,26 @@ spec:
             - -c
             - |
               set -eu
-              echo "Configuring aliases..."
-              mc alias set miniosrc http://minio:9000 "${MINIO_ROOT_USER}" "${MINIO_ROOT_PASSWORD}"
-              mc alias set rustfsdst http://rustfs:9000 "${S3_ACCESS_KEY_ID}" "${S3_SECRET_ACCESS_KEY}"
+              rc alias set miniosrc http://minio:9000 "${MINIO_ROOT_USER}" "${MINIO_ROOT_PASSWORD}"
+              rc alias set rustfsdst http://rustfs:9000 "${S3_ACCESS_KEY_ID}" "${S3_SECRET_ACCESS_KEY}"
 
+              # Buckets and their anonymous policies are created by rustfs-setup.
               for bucket in "${S3_BUCKET}" "${S3_SITEMAPS_BUCKET}" "${S3_IMPORTS_BUCKET}"; do
-                echo "=== Mirroring bucket ${bucket}: miniosrc -> rustfsdst ==="
-                if mc ls "miniosrc/${bucket}" > /dev/null 2>&1; then
-                  mc mirror --overwrite "miniosrc/${bucket}" "rustfsdst/${bucket}"
-                else
-                  echo "Bucket ${bucket} does not exist on MinIO, skipping."
-                fi
+                echo "=== Mirroring ${bucket}: minio -> rustfs ==="
+                rc mirror "miniosrc/${bucket}/" "rustfsdst/${bucket}/"
               done
 
-              echo "=== Verifying object counts ==="
+              # Every MinIO object must exist identically on RustFS. Objects only
+              # on RustFS are fine (new uploads after the cutover).
+              failed=0
               for bucket in "${S3_BUCKET}" "${S3_SITEMAPS_BUCKET}" "${S3_IMPORTS_BUCKET}"; do
-                src_count=$(mc ls --recursive "miniosrc/${bucket}" 2>/dev/null | wc -l)
-                dst_count=$(mc ls --recursive "rustfsdst/${bucket}" 2>/dev/null | wc -l)
-                echo "${bucket}: minio=${src_count} rustfs=${dst_count}"
-                if [ "${src_count}" != "${dst_count}" ]; then
-                  echo "MISMATCH on ${bucket} — investigate before cutting over."
-                  exit 1
-                fi
+                summary=$(rc diff --recursive "miniosrc/${bucket}/" "rustfsdst/${bucket}/" | grep '^Summary:' || true)
+                echo "${bucket}: ${summary}"
+                case "${summary}" in
+                  *" 0 different, 0 only in first,"*) ;;
+                  *) echo "MISMATCH on ${bucket}, investigate before cutting over."; failed=1 ;;
+                esac
               done
+              [ "${failed}" -eq 0 ]
 
-              echo "Migration complete, object counts match on every bucket."
+              echo "Migration complete, every MinIO object is on RustFS."
