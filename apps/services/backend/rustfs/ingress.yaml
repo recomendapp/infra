@@ -9,7 +9,9 @@ spec:
   tls:
     - hosts:
         - medias.recomend.app
-      secretName: rustfs-tls
+      # Inherited from the MinIO ingress: the cert-manager Secret outlives the
+      # old Ingress, so reusing its name avoids a reissue (and a TLS gap).
+      secretName: minio-tls
   rules:
     - host: medias.recomend.app
       http:
