@@ -16,6 +16,6 @@ spec:
           imagePullPolicy: Always
           envFrom:
             - secretRef:
-                name: minio-secret
+                name: rustfs-secret
       restartPolicy: Never
   backoffLimit: 4

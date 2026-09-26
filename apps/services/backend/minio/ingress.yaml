@@ -18,6 +18,8 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: minio
+                # RustFS cutover: kept in minio/ so the existing minio-tls cert
+                # is reused; moves to rustfs/ when minio/ is removed.
+                name: rustfs
                 port:
                   number: 9000
