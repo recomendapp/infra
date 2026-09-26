@@ -13,6 +13,12 @@ spec:
       labels:
         app: rustfs
     spec:
+      # The image runs as uid/gid 10001 but the hcloud volume mounts root-owned:
+      # without fsGroup, `mkdir /data/rustfs0` fails and the pod crash-loops.
+      securityContext:
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
       containers:
       - name: rustfs
         image: rustfs/rustfs:1.0.0-alpha.86
