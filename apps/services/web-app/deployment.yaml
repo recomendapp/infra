@@ -45,8 +45,6 @@ spec:
               cpu: "2"
               memory: "4Gi"
           env:
-            - name: NODE_OPTIONS
-              value: "--max-old-space-size=2048 --dns-result-order=ipv4first"
             - name: INTERNAL_API_URL
               value: "http://api.backend.svc.cluster.local:80"
           envFrom:
