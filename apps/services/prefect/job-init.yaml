@@ -106,22 +106,6 @@ spec:
                 secretKeyRef:
                   name: prefect-secrets
                   key: API_INTERNAL_IMPORTS_SECRET
-            - name: API_INTERNAL_VERSION_POLICY_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: prefect-secrets
-                  key: API_INTERNAL_VERSION_POLICY_SECRET
-
-            - name: GOOGLE_PLAY_PACKAGE_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: prefect-secrets
-                  key: GOOGLE_PLAY_PACKAGE_NAME
-            - name: GOOGLE_PLAY_SERVICE_ACCOUNT_JSON
-              valueFrom:
-                secretKeyRef:
-                  name: prefect-secrets
-                  key: GOOGLE_PLAY_SERVICE_ACCOUNT_JSON
 
           command:
             - /bin/sh
@@ -214,21 +198,6 @@ spec:
               Secret(value=os.environ["API_INTERNAL_URL"]).save("api-internal-url", overwrite=True)
               Secret(value=os.environ["API_INTERNAL_IMPORTS_SECRET"]).save("api-internal-imports-secret", overwrite=True)
               print("Import blocks created.")
-
-              # ---------------------
-              # Mobile version-policy blocks (see db-sync/store_release_watch)
-              # ---------------------
-              print("Creating store-release-watch blocks...")
-              Secret(value=os.environ["API_INTERNAL_VERSION_POLICY_SECRET"]).save(
-                  "api-internal-version-policy-secret", overwrite=True
-              )
-              Secret(value=os.environ["GOOGLE_PLAY_PACKAGE_NAME"]).save(
-                  "google-play-package-name", overwrite=True
-              )
-              Secret(value=os.environ["GOOGLE_PLAY_SERVICE_ACCOUNT_JSON"]).save(
-                  "google-play-service-account-json", overwrite=True
-              )
-              print("Store-release-watch blocks created.")
 
               print("Init job completed successfully.")
               EOF
