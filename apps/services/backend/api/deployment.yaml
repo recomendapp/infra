@@ -235,6 +235,14 @@ spec:
                   name: api-secret
                   key: API_INTERNAL_IMPORTS_SECRET
 
+            # --- Mobile CI — internal webhook auth for writing the version_policy table
+            #     (see .github/workflows/mobile-router.yml) ---
+            - name: API_INTERNAL_VERSION_POLICY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: API_INTERNAL_VERSION_POLICY_SECRET
+
             # --- App Store Connect — JWT auth for resolving the appStoreVersions id an
             #     incoming webhook event refers to into an actual version/platform ---
             - name: APP_STORE_CONNECT_KEY_ID
