@@ -257,3 +257,8 @@ spec:
                 secretKeyRef:
                   name: api-secret
                   key: APP_STORE_CONNECT_APP_ID
+            - name: APP_STORE_CONNECT_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: APP_STORE_CONNECT_WEBHOOK_SECRET
