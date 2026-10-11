@@ -33,7 +33,12 @@ main() {
     log_info "Creating GitHub repository credentials..."
     kubectl apply -f "$PROJECT_ROOT/bootstrap/argocd/github-repo.yaml" >/dev/null
     wait_for_externalsecret "argocd" "github-repo" || return 1
-   
+
+    # GitHub webhook secret
+    log_info "Creating GitHub webhook secret..."
+    kubectl apply -f "$PROJECT_ROOT/bootstrap/argocd/webhook-secret.yaml" >/dev/null
+    wait_for_externalsecret "argocd" "argocd-webhook-secret" || return 1
+
     log_success "ArgoCD installed successfully"
 }
 
