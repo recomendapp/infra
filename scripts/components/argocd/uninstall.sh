@@ -28,7 +28,8 @@ main() {
     log_info "Deleting GitHub credentials..."
     kubectl delete externalsecret github-credentials -n argocd 2>/dev/null || log_warning "ExternalSecret not found"
     kubectl delete externalsecret github-repo -n argocd 2>/dev/null || log_warning "ExternalSecret not found"
-    
+    kubectl delete externalsecret argocd-webhook-secret -n argocd 2>/dev/null || log_warning "ExternalSecret not found"
+
     # Delete secrets
     kubectl delete secret github-credentials -n argocd 2>/dev/null || true
     kubectl delete secret github-repo -n argocd 2>/dev/null || true
