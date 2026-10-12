@@ -32,6 +32,18 @@ spec:
           # disabling it silently stops PVC auto-resize.
           kubelet:
             enabled: true
+            serviceMonitor:
+              # k3s is a single binary, so its kubelet metrics endpoint also
+              # serves the embedded apiserver and etcd - 53k of the 173k
+              # series came from there, which is why disabling the
+              # kubeApiServer and kubeEtcd monitors changed nothing. Keep
+              # only what pvc-autoresizer queries.
+              metricRelabelings:
+                - sourceLabels: [__name__]
+                  regex: kubelet_volume_stats_.*
+                  action: keep
+              cAdvisor: false
+              probes: false
           kubeApiServer:
             enabled: false
           kubeControllerManager:
