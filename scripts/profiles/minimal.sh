@@ -14,7 +14,6 @@ main() {
     log_info "Installing only core components..."
     
     local components=(
-        "cert-manager"
         "external-secrets"
         "infisical"
     )
