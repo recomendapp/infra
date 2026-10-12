@@ -7,18 +7,16 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: web-app
-  minReplicas: 2
+  minReplicas: 1
   maxReplicas: 4
   metrics:
+  # CPU only. Next.js heap grows with uptime rather than with load - a pod
+  # measured 278Mi fresh and 1283Mi after two days on identical traffic - so a
+  # memory target scales up on accumulation, never scales back down, and would
+  # defeat minReplicas: 1 within days.
   - type: Resource
     resource:
       name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 80
-  - type: Resource
-    resource:
-      name: memory
       target:
         type: Utilization
         averageUtilization: 80
