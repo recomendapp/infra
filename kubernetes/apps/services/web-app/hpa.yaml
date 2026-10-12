@@ -9,6 +9,21 @@ spec:
     name: web-app
   minReplicas: 1
   maxReplicas: 4
+  # scaleUp takes the minimum recommendation over its window, so a spike
+  # shorter than 300s never adds a pod - only sustained load does.
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 120
+    scaleDown:
+      stabilizationWindowSeconds: 600
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 180
   metrics:
   # CPU only. Next.js heap grows with uptime rather than with load - a pod
   # measured 278Mi fresh and 1283Mi after two days on identical traffic - so a
