@@ -43,12 +43,6 @@ help:
 	@echo "🧹 Uninstall:"
 	@echo "  make uninstall				Uninstall all GitOps managed applications"
 	@echo ""
-	@echo "💾 Backup (Velero):"
-	@echo "  make backup-create			Create a manual backup"
-	@echo "  make backup-list			List all backups"
-	@echo "  make backup-status			Check Velero status"
-	@echo "  make backup-restore		Restore from a backup"
-	@echo ""
 	@echo "════════════════════════════════════════════════════════════════════"
 
 # ============================================================================
@@ -148,12 +142,5 @@ argocd-sync:
 	@argocd app sync root
 	@kubectl -n argocd patch app root --type merge -p '{"spec":{"syncPolicy":{"automated":{"prune":true,"selfHeal":true}}}}' >/dev/null
 	@echo "✅ Sync complete."
-
-# ============================================================================
-# Backup
-# ============================================================================
-.PHONY: backup
-backup:
-	@./scripts/backup/entrypoint.sh
 
 .DEFAULT_GOAL := help
