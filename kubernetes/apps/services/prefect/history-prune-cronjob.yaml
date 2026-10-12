@@ -1,0 +1,90 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: prefect-history-prune
+  namespace: prefect
+spec:
+  # Sunday 04:30, clear of the 03:00/03:30/04:00 database backups.
+  schedule: "30 4 * * 0"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 3600
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      # Hard stop: a run that cannot finish in two hours has hit something
+      # unexpected and should fail loudly rather than hold locks all night.
+      activeDeadlineSeconds: 7200
+      backoffLimit: 1
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: prune
+              image: postgres:16-alpine
+              env:
+                - name: PGHOST
+                  value: prefect-postgresql
+                - name: PGUSER
+                  value: prefect
+                - name: PGDATABASE
+                  value: server
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: prefect-postgresql
+                      key: password
+                - name: KEEP_DAYS
+                  value: "30"
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  cpu: 500m
+                  memory: 256Mi
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -eu
+
+                  PSQL="psql -X -q -t -A -v ON_ERROR_STOP=1"
+                  CUTOFF="now() - interval '${KEEP_DAYS} days'"
+
+                  # 2617 flow runs had produced 5.7M task runs and 16M task run
+                  # states: the fan-out is ~2200 task runs per flow run, so
+                  # deleting flow runs in small batches keeps each transaction
+                  # and each lock short enough for Prefect to keep writing.
+                  echo "pruning flow runs older than ${KEEP_DAYS} days"
+                  i=0
+                  while [ "$i" -lt 400 ]; do
+                    $PSQL -c "SELECT EXISTS(SELECT 1 FROM flow_run WHERE created < ${CUTOFF})" | grep -q '^t$' || break
+                    $PSQL -c "DELETE FROM flow_run WHERE id IN (
+                                SELECT id FROM flow_run WHERE created < ${CUTOFF}
+                                ORDER BY created LIMIT 25)"
+                    i=$((i + 1))
+                  done
+                  echo "  ${i} batch(es)"
+
+                  # log has no foreign key to flow_run, so the cascade above
+                  # never reaches it. It does have an index on timestamp.
+                  echo "pruning logs older than ${KEEP_DAYS} days"
+                  j=0
+                  while [ "$j" -lt 400 ]; do
+                    $PSQL -c "SELECT EXISTS(SELECT 1 FROM log WHERE timestamp < ${CUTOFF})" | grep -q '^t$' || break
+                    $PSQL -c "DELETE FROM log WHERE id IN (
+                                SELECT id FROM log WHERE timestamp < ${CUTOFF}
+                                LIMIT 50000)"
+                    j=$((j + 1))
+                  done
+                  echo "  ${j} batch(es)"
+
+                  # Plain VACUUM, never VACUUM FULL: this marks the freed space
+                  # reusable so the volume stops growing, without taking the
+                  # exclusive lock that would block Prefect. Returning the space
+                  # to the filesystem needs VACUUM FULL and downtime.
+                  echo "vacuum analyze"
+                  $PSQL -c "VACUUM ANALYZE flow_run, task_run, task_run_state, flow_run_state, log"
+
+                  $PSQL -c "SELECT 'remaining: ' || pg_size_pretty(pg_database_size(current_database()))"
