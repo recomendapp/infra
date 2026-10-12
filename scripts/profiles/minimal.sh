@@ -11,13 +11,12 @@ main() {
     
     check_kubectl || exit 1
     
-    log_info "Installing only core components + Velero for restore..."
+    log_info "Installing only core components..."
     
     local components=(
         "cert-manager"
         "external-secrets"
         "infisical"
-        "velero"
         "reflector"
     )
     
@@ -30,7 +29,7 @@ main() {
         fi
     done
     
-    log_success "Minimal bootstrap complete - ready for Velero restore"
+    log_success "Minimal bootstrap complete"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

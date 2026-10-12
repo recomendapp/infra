@@ -13,61 +13,48 @@ spec:
       targetRevision: 79.7.1
       helm:
         valuesObject:
-          defaultRules:
-            rules:
-              kubeProxy: false
-              kubeSchedulerAlerting: false
           grafana:
-            enabled: true
-            admin:
-              existingSecret: monitoring-secrets
-              userKey: admin-user
-              passwordKey: admin-password
-            ingress:
-              enabled: true
-              ingressClassName: traefik
-              annotations:
-                cert-manager.io/cluster-issuer: letsencrypt-production
-                traefik.ingress.kubernetes.io/router.entrypoints: websecure
-              hosts:
-                - grafana.recomend.app
-              tls:
-                - secretName: grafana-tls
-                  hosts:
-                    - grafana.recomend.app
-            sidecar:
-              dashboards:
-                enabled: true
-                label: grafana_dashboard
-                labelValue: "1"
-                searchNamespace: ALL
-            resources:
-              requests:
-                cpu: 100m
-                memory: 128Mi
-              limits:
-                cpu: 500m
-                memory: 512Mi
+            enabled: false
 
-          prometheus-node-exporter:
-            hostPort: 19100
-            resources:
-              requests:
-                cpu: 50m
-                memory: 64Mi
-              limits:
-                cpu: 100m
-                memory: 128Mi
+          alertmanager:
+            enabled: false
+
+          kubeStateMetrics:
+            enabled: false
+
+          nodeExporter:
+            enabled: false
+
+          defaultRules:
+            create: false
+
+          # pvc-autoresizer reads kubelet_volume_stats_* from this target;
+          # disabling it silently stops PVC auto-resize.
+          kubelet:
+            enabled: true
+          kubeApiServer:
+            enabled: false
+          kubeControllerManager:
+            enabled: false
+          kubeScheduler:
+            enabled: false
+          kubeProxy:
+            enabled: false
+          kubeEtcd:
+            enabled: false
+          coreDns:
+            enabled: false
 
           prometheus:
             prometheusSpec:
+              retention: 2d
               resources:
                 requests:
-                  cpu: 200m
-                  memory: 1Gi
+                  cpu: 50m
+                  memory: 256Mi
                 limits:
-                  cpu: "1"
-                  memory: 4Gi
+                  cpu: 500m
+                  memory: 1Gi
               storageSpec:
                 volumeClaimTemplate:
                   spec:
@@ -75,26 +62,10 @@ spec:
                     accessModes: ["ReadWriteOnce"]
                     resources:
                       requests:
+                        # A StatefulSet volumeClaimTemplate is immutable and a
+                        # Hetzner volume cannot shrink: a lower value fails the
+                        # sync. Reclaiming it needs a delete-and-recreate.
                         storage: 20Gi
-          alertmanager:
-            alertmanagerSpec:
-              useExistingSecret: true
-              configSecret: monitoring-secrets
-              resources:
-                requests:
-                  cpu: 100m
-                  memory: 128Mi
-                limits:
-                  cpu: 500m
-                  memory: 512Mi
-          kube-state-metrics:
-            resources:
-              requests:
-                cpu: 100m
-                memory: 128Mi
-              limits:
-                cpu: 200m
-                memory: 256Mi
 
     - repoURL: https://github.com/recomendapp/infra.git
       targetRevision: main
