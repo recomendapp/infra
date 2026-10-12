@@ -24,11 +24,6 @@ main() {
     wait_for_crd "appprojects.argoproj.io" || return 1
     wait_for_deployment "argocd" "argocd-server" || return 1
     
-    # GitHub Docker credentials
-    log_info "Creating GitHub Docker credentials..."
-    kubectl apply -f "$PROJECT_ROOT/bootstrap/argocd/github-credentials.yaml" >/dev/null
-    wait_for_externalsecret "argocd" "github-credentials" || return 1
-    
     # GitHub repo credentials
     log_info "Creating GitHub repository credentials..."
     kubectl apply -f "$PROJECT_ROOT/bootstrap/argocd/github-repo.yaml" >/dev/null
