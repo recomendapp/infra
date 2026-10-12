@@ -4,7 +4,8 @@ kubeconfig*
 # env files
 .env
 .env*.local
-# Vendored by `kustomize build --enable-helm`; ArgoCD fetches charts itself.
+
 kubernetes/**/charts/
 node_modules/
 .DS_Store
+.kube/
