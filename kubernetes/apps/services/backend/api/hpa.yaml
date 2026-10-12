@@ -9,6 +9,21 @@ spec:
     name: api
   minReplicas: 1
   maxReplicas: 4
+  # scaleUp takes the minimum recommendation over its window, so a spike
+  # shorter than 300s never adds a pod - only sustained load does.
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 120
+    scaleDown:
+      stabilizationWindowSeconds: 600
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 180
   metrics:
   # CPU only: memory here is a flat per-pod baseline, so a memory target
   # makes scale-up irreversible and minReplicas unreachable.
