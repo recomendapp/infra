@@ -3,3 +3,4 @@ resources:
   - secrets.yaml
   - job-init.yaml
   - base-job-template-cm.yaml
+  - history-prune-cronjob.yaml
