@@ -80,3 +80,20 @@ spec:
                 secretKeyRef:
                   name: typesense-secret
                   key: TYPESENSE_API_KEY
+
+            # --- Google Play release polling (via worker-secret) ---
+            # `optional` so a not-yet-provisioned key leaves the worker running with the
+            # poller disabled, instead of holding every rollout in CreateContainerConfigError
+            # -- a missing key fails the whole ExternalSecret, so worker-secret may not exist.
+            - name: GOOGLE_PLAY_RELEASE_READER_B64
+              valueFrom:
+                secretKeyRef:
+                  name: worker-secret
+                  key: GOOGLE_PLAY_RELEASE_READER_B64
+                  optional: true
+            - name: ANDROID_PACKAGE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: worker-secret
+                  key: ANDROID_PACKAGE_NAME
+                  optional: true
