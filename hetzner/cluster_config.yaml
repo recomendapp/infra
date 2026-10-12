@@ -1,6 +1,8 @@
 ---
 config_format_version: 1
-hetzner_token: ${HCLOUD_TOKEN}
+# No hetzner_token key on purpose: hetzner-k3s defaults it to the HCLOUD_TOKEN
+# env var, and any key here overrides that - YAML has no interpolation, so a
+# "${HCLOUD_TOKEN}" placeholder is read as that literal string.
 cluster_name: recomend
 kubeconfig_path: "./kubeconfig"
 k3s_version: v1.30.3+k3s1
