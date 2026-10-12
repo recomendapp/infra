@@ -17,7 +17,6 @@ main() {
         "cert-manager"
         "external-secrets"
         "infisical"
-        "reflector"
     )
     
     for component in "${components[@]}"; do
