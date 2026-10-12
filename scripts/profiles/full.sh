@@ -15,7 +15,6 @@ main() {
 and then apply the root application to bootstrap the cluster."
     
     local components=(
-        "cert-manager"
         "external-secrets"
         "infisical"
         "argocd"
