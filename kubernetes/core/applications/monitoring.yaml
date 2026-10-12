@@ -74,10 +74,10 @@ spec:
                     accessModes: ["ReadWriteOnce"]
                     resources:
                       requests:
-                        # A StatefulSet volumeClaimTemplate is immutable and a
-                        # Hetzner volume cannot shrink: a lower value fails the
-                        # sync. Reclaiming it needs a delete-and-recreate.
-                        storage: 20Gi
+                        # Lowering this needs the StatefulSet and its PVC deleted
+                        # so the operator rebuilds both: a volumeClaimTemplate is
+                        # immutable and a Hetzner volume cannot shrink in place.
+                        storage: 10Gi
 
     - repoURL: https://github.com/recomendapp/infra.git
       targetRevision: main
