@@ -1,5 +1,5 @@
 # Runner image for the "infra-android-heavy" ARC scale-set
-# (cluster/services/actions-runner-scale-set-android). Preinstalls everything
+# (kubernetes/core/services/actions-runner-scale-set-android). Preinstalls everything
 # build-submit-android.yml would otherwise install on every run: Java 17,
 # Node/pnpm, Android SDK + NDK, eas-cli + eas-cli-local-build-plugin.
 #

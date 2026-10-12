@@ -1,20 +1,20 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: traefik-patch
+  name: backend
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "45"
 spec:
   project: default
   source:
     repoURL: https://github.com/recomendapp/infra.git
     targetRevision: main
-    path: cluster/services/traefik-patch
+    path: kubernetes/apps/services/backend
   destination:
     server: https://kubernetes.default.svc
-    namespace: kube-system
+    namespace: backend
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

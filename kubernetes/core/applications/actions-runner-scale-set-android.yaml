@@ -1,17 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: backend
+  name: actions-runner-scale-set-android
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "16"
 spec:
   project: default
   source:
     repoURL: https://github.com/recomendapp/infra.git
     targetRevision: main
-    path: apps/services/backend
+    path: kubernetes/core/services/actions-runner-scale-set-android
   destination:
     server: https://kubernetes.default.svc
-    namespace: backend
+    namespace: arc-runners
   syncPolicy:
     automated:
       prune: true
