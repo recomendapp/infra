@@ -10,7 +10,7 @@ main() {
     log_component "GitOps Root Application"
     
     log_info "Applying the root application to bootstrap the cluster..."
-    kubectl apply -f "$PROJECT_ROOT/cluster/root.yaml" >/dev/null
+    kubectl apply -f "$PROJECT_ROOT/kubernetes/core/root.yaml" >/dev/null
     
     log_success "GitOps configured - ArgoCD will now sync all applications"
 }

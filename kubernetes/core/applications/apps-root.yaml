@@ -1,16 +1,20 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: root
+  name: root-apps
+  
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "100"
 spec:
   project: default
   source:
     repoURL: https://github.com/recomendapp/infra.git
     targetRevision: main
-    path: cluster/applications
+    path: kubernetes/apps
     directory:
       recurse: true
+      exclude: 'services/**'
   destination:
     server: https://kubernetes.default.svc
     namespace: default

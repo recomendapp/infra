@@ -10,7 +10,7 @@ main() {
     log_component "GitOps Root Application"
     
     log_info "Deleting the root application to tear down the cluster..."
-    kubectl delete -f "$PROJECT_ROOT/cluster/root.yaml" --ignore-not-found=true >/dev/null
+    kubectl delete -f "$PROJECT_ROOT/kubernetes/core/root.yaml" --ignore-not-found=true >/dev/null
     
     log_success "GitOps root application deleted - ArgoCD will now prune all applications"
 }

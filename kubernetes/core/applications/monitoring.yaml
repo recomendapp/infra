@@ -81,7 +81,7 @@ spec:
 
     - repoURL: https://github.com/recomendapp/infra.git
       targetRevision: main
-      path: cluster/services/monitoring
+      path: kubernetes/core/services/monitoring
       directory:
         recurse: true
 

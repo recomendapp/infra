@@ -1,19 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: external-dns
+  name: root
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "30"
 spec:
   project: default
   source:
     repoURL: https://github.com/recomendapp/infra.git
     targetRevision: main
-    path: cluster/services/external-dns
+    path: kubernetes/core/applications
+    directory:
+      recurse: true
   destination:
     server: https://kubernetes.default.svc
-    namespace: external-dns
+    namespace: default
   syncPolicy:
     automated:
       prune: true

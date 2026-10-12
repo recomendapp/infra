@@ -5,7 +5,7 @@ githubConfigSecret: arc-github-app-credentials
 # Helm `lookup()` against the live cluster. ArgoCD renders via `helm template`
 # (no live cluster access at render time), so lookup() returns nothing and
 # the chart errors out unless this is set explicitly. Name follows the
-# controller's release name from cluster/services/actions-runner-controller
+# controller's release name from kubernetes/core/services/actions-runner-controller
 # (releaseName: arc-controller -> <releaseName>-gha-rs-controller).
 controllerServiceAccount:
   namespace: arc-systems

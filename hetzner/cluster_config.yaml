@@ -166,7 +166,7 @@ worker_node_pools:
 # without the taint, a small unrelated pending pod could trigger a scale-up
 # of this (pricier) pool instead of medium-*, since cluster-autoscaler picks
 # whichever node group can fit the pod. Only pods with a matching toleration
-# (see cluster/services/actions-runner-scale-set-android/values.yaml) can be
+# (see kubernetes/core/services/actions-runner-scale-set-android/values.yaml) can be
 # scheduled here.
 - name: large-android
   instance_type: cx43

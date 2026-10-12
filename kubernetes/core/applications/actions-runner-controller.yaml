@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/recomendapp/infra.git
     targetRevision: main
-    path: cluster/services/actions-runner-controller
+    path: kubernetes/core/services/actions-runner-controller
   destination:
     server: https://kubernetes.default.svc
     namespace: arc-systems

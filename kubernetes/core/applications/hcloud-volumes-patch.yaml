@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: 'https://github.com/recomendapp/infra.git'
     targetRevision: main
-    path: cluster/services/hcloud-volumes-patch
+    path: kubernetes/core/services/hcloud-volumes-patch
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: kube-system 

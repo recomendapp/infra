@@ -67,7 +67,7 @@ spec:
 
     - repoURL: https://github.com/recomendapp/infra.git
       targetRevision: main
-      path: apps/services/prefect
+      path: kubernetes/apps/services/prefect
       directory:
         recurse: true
 

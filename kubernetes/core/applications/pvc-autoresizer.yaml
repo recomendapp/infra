@@ -24,7 +24,7 @@ spec:
     
     - repoURL: https://github.com/recomendapp/infra.git
       targetRevision: main
-      path: cluster/services/pvc-autoresizer
+      path: kubernetes/core/services/pvc-autoresizer
 
   destination:
     server: "https://kubernetes.default.svc"
