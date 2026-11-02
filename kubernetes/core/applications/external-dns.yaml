@@ -4,8 +4,8 @@ metadata:
   name: external-dns
   namespace: argocd
   annotations:
-    # Après cloudflared (6) : un CNAME vers un tunnel pas encore debout ne
-    # résout rien, et Cloudflare met ça en cache.
+    # After cloudflared (6): a CNAME to a tunnel that is not up yet resolves
+    # to nothing, and Cloudflare caches it.
     argocd.argoproj.io/sync-wave: "7"
 spec:
   project: default

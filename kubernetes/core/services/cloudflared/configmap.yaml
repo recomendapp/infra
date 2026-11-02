@@ -1,17 +1,11 @@
-# La table de routage du tunnel, dans git plutôt que dans le dashboard.
+# The tunnel's routing table. Adding a hostname is one entry here plus an
+# Ingress.
 #
-# Tous les hostnames atterrissent sur le même Traefik interne, qui route
-# ensuite sur le Host header exactement comme quand ce cluster avait une IP
-# publique. Ajouter un hostname = une entrée ici plus un Ingress.
+# http, not https: a tunnel means Cloudflare terminates TLS at its edge
+# whatever the origin speaks, so a certificate on Traefik would only encrypt
+# this hop, which never leaves the pod network. Hence no cert-manager here.
 #
-# http, pas https. Un tunnel veut dire que Cloudflare termine le TLS à son
-# edge quoi que parle l'origine, donc un certificat sur Traefik ne chiffrerait
-# que ce saut, qui ne quitte jamais le réseau de pods du cluster. C'est pour
-# ça qu'il n'y a pas de cert-manager ici.
-#
-# `tunnel:` doit correspondre au TunnelID contenu dans CLOUDFLARE_TUNNEL_TOKEN.
-# C'est un identifiant, pas un secret — il apparaît aussi dans la cible
-# external-dns de chaque Ingress, puisque c'est là que pointent les CNAME.
+# `tunnel:` must match the TunnelID inside CLOUDFLARE_TUNNEL_TOKEN.
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -40,6 +34,5 @@ data:
         service: http://traefik.traefik.svc.cluster.local:80
       - hostname: prefect.recomend.app
         service: http://traefik.traefik.svc.cluster.local:80
-      # Règle terminale obligatoire : cloudflared refuse une config dont la
-      # dernière entrée porte un hostname.
+      # Required: cloudflared refuses a config whose last entry has a hostname.
       - service: http_status:404

@@ -59,8 +59,4 @@ spec:
       storageClassName: longhorn
       resources:
         requests:
-          # 27,7 Gi réellement utilisés (mesuré via kubelet_volume_stats).
-          # Les 20Gi déclarés datent d'avant que pvc-autoresizer ne pousse
-          # le volume Hetzner à 50Gi ; sans autoresizer chez nous, il faut
-          # déclarer la taille réelle. Longhorn réplique x2 : 100 Gi d'array.
           storage: 50Gi

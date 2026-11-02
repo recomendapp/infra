@@ -61,6 +61,4 @@ spec:
       storageClassName: longhorn
       resources:
         requests:
-          # 6,7 Gi utilisés, soit 68 % des 10Gi d'origine — trop juste pour
-          # un volume qui ne peut plus grandir tout seul.
           storage: 20Gi

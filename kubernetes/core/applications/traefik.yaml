@@ -4,8 +4,8 @@ metadata:
   name: traefik
   namespace: argocd
   annotations:
-    # Avant tout le reste : chaque Ingress du cluster référence
-    # ingressClassName: traefik, et l'IngressClass vient de ce chart.
+    # Before everything: every Ingress names ingressClassName: traefik, and
+    # the IngressClass comes from this chart.
     argocd.argoproj.io/sync-wave: "5"
 spec:
   project: default

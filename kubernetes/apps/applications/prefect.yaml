@@ -47,8 +47,6 @@ spec:
               persistence:
                 enabled: true
                 storageClass: longhorn
-                # 32,6 Gi réellement utilisés contre 10Gi déclarés :
-                # pvc-autoresizer avait poussé le volume Hetzner à 44Gi.
                 # C'est presque tout de l'historique de flow runs, et le
                 # CronJob history-prune ne suit visiblement pas. À purger
                 # avant la copie, ce qui permettrait de redescendre ici.

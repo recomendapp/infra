@@ -3,11 +3,10 @@ kind: HorizontalPodAutoscaler
 metadata:
   name: api
   annotations:
-    # Après le Deployment qu'il cible (wave 3). Sans ça l'HPA part en wave 0,
-    # le contrôleur répond `deployments.apps "api" not found`, ArgoCD tient
-    # l'HPA pour non sain et ne quitte jamais la wave 0 : l'api, notify,
-    # worker et postgres ne sont jamais déployés. Invisible sur un cluster
-    # où le Deployment existe déjà — c'est un bug de premier démarrage.
+    # After the Deployment it targets (wave 3). At wave 0 the controller
+    # reports `deployments.apps "api" not found`, ArgoCD reads the HPA as
+    # unhealthy and never leaves wave 0, so nothing in backend deploys. Only
+    # reproducible on an empty cluster.
     argocd.argoproj.io/sync-wave: "4"
 spec:
   scaleTargetRef:

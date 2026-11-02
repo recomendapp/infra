@@ -13,12 +13,10 @@ spec:
       labels:
         app: api
     spec:
-      # Un vcluster injecte les service links du cluster virtuel comme
-      # entrées `env:` explicites, et `env:` l'emporte sur `envFrom:` — alors
-      # que sur Kubernetes nu les service links passent en dernier et perdent
-      # contre les deux. Avec des Services nommés `redis` et `typesense`, ça
-      # écrase REDIS_PORT et TYPESENSE_PORT par `tcp://10.x.x.x:6379`. Vérifié
-      # sur pave : notify plantait sur "invalid digit found in string".
+      # A vcluster injects the virtual cluster's service links as explicit
+      # `env:` entries, and `env:` outranks `envFrom:`. With Services named
+      # `redis` and `typesense` that shadows REDIS_PORT and TYPESENSE_PORT
+      # with `tcp://10.x.x.x:6379`. On plain Kubernetes they lose to both.
       enableServiceLinks: false
       imagePullSecrets:
         - name: github-credentials

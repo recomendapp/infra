@@ -4,9 +4,8 @@ metadata:
   name: cloudflared
   namespace: argocd
   annotations:
-    # Après Traefik (5), vers qui il proxifie. Avant external-dns, qui fera
-    # pointer les CNAME sur ce tunnel : un CNAME vers un tunnel pas encore
-    # debout ne résout rien, et Cloudflare met ça en cache.
+    # After Traefik (5), which it proxies to. Before external-dns: a CNAME to
+    # a tunnel that is not up yet resolves to nothing, and Cloudflare caches it.
     argocd.argoproj.io/sync-wave: "6"
 spec:
   project: default
