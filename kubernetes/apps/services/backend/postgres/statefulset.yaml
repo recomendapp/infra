@@ -33,6 +33,13 @@ spec:
           - work_mem=32MB
           - -c
           - maintenance_work_mem=512MB
+          # postgis and unaccent live in the `extensions` schema and the setup
+          # script calls st_makepoint unqualified. A plain pg_dump does not
+          # carry ALTER DATABASE ... SET, so the search_path the old cluster
+          # had was lost on restore and db-migrator failed with
+          # "function st_makepoint(unknown, unknown) does not exist".
+          - -c
+          - search_path=public,extensions
         envFrom:
           - secretRef:
               name: postgres-secret
