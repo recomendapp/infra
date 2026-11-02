@@ -21,6 +21,18 @@ spec:
       containers:
       - name: postgres
         image: ghcr.io/recomendapp/postgres:b124-00f6a3a
+        # The 4MB work_mem default made REFRESH MATERIALIZED VIEW
+        # tmdb.person_feed_view spill a 2.7 GB sort to temp files and take
+        # 35 minutes. work_mem stays modest: it applies per sort, per
+        # connection.
+        args:
+          - postgres
+          - -c
+          - shared_buffers=1GB
+          - -c
+          - work_mem=32MB
+          - -c
+          - maintenance_work_mem=512MB
         envFrom:
           - secretRef:
               name: postgres-secret
