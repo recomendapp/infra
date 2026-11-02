@@ -2,6 +2,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: rustfs
+  annotations:
+    external-dns.kubernetes.io/target: eaa1365e-4fbc-4be3-b071-595fc95e7506.cfargotunnel.com
 spec:
   ingressClassName: traefik
   rules:

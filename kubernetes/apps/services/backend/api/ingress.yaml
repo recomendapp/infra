@@ -2,6 +2,14 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: api
+  annotations:
+    # Où pointe le CNAME de ce hostname. Sans ça external-dns prend
+    # l'endpoint publié par Traefik et écrit un nom DNS interne dans une zone
+    # publique — 530 sur chaque requête, vérifié sur pave. Et noter le
+    # préfixe : `external-dns.kubernetes.io/`, PAS
+    # `external-dns.alpha.kubernetes.io/` que montrent tous les exemples du
+    # web ; v0.23 ne lit plus le legacy par défaut et l'ignore en silence.
+    external-dns.kubernetes.io/target: eaa1365e-4fbc-4be3-b071-595fc95e7506.cfargotunnel.com
 spec:
   ingressClassName: traefik
   rules:

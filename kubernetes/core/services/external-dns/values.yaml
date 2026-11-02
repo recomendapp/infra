@@ -1,0 +1,49 @@
+# Surveille chaque Ingress et tient un enregistrement Cloudflare par host,
+# donc ajouter un hostname = un Ingress et rien d'autre.
+#
+# CNAME, pas A : il n'y a plus d'IP publique à viser, le trafic arrive par le
+# tunnel Cloudflare dont l'adresse est <tunnel-id>.cfargotunnel.com. Chaque
+# Ingress la nomme dans une annotation `external-dns.kubernetes.io/target` —
+# et noter le préfixe : PAS `external-dns.alpha.kubernetes.io/`, que v0.23 ne
+# lit plus par défaut et qu'il ignorerait en silence.
+provider: cloudflare
+
+env:
+  - name: CF_API_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: cloudflare-api-token
+        key: api-token
+
+sources:
+  - ingress
+
+extraArgs:
+  # Un CNAME vers cfargotunnel.com n'est joignable que proxifié.
+  - --cloudflare-proxied
+  # A est listé le temps de la bascule : ces hostnames portent encore les
+  # enregistrements A du cluster Hetzner, et Cloudflare refuse un CNAME sur un
+  # nom qui a déjà un A. Gérer le type qu'il doit retirer est ce qui lui permet
+  # de remplacer au lieu d'échouer. À retirer une fois la bascule faite.
+  - --managed-record-types=A
+  - --managed-record-types=CNAME
+  - --managed-record-types=TXT
+
+policy: sync
+registry: txt
+# MÊME propriétaire que l'external-dns du cluster Hetzner, et c'est voulu :
+# avec un txtOwnerId différent, celui-ci verrait les enregistrements comme
+# appartenant à un tiers et, en policy sync, n'y toucherait pas — les CNAME ne
+# seraient jamais créés. La reprise exige qu'il les reconnaisse comme siens.
+# C'est sans risque uniquement parce que les VPS Hetzner sont éteints : les
+# deux allumés en même temps se battraient toutes les minutes.
+txtOwnerId: "k8s"
+interval: "1m"
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi
