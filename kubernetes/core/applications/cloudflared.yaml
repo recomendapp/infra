@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cloudflared
+  namespace: argocd
+  annotations:
+    # Après Traefik (5), vers qui il proxifie. Avant external-dns, qui fera
+    # pointer les CNAME sur ce tunnel : un CNAME vers un tunnel pas encore
+    # debout ne résout rien, et Cloudflare met ça en cache.
+    argocd.argoproj.io/sync-wave: "6"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/recomendapp/infra.git
+    targetRevision: vcluster
+    path: kubernetes/core/services/cloudflared
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cloudflared
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

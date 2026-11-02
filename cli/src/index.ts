@@ -18,7 +18,7 @@ async function menu() {
   const section = await p.select({
     message: "What do you want to do?",
     options: [
-      { value: "install", label: "Install", hint: "bring up the Hetzner k3s cluster + bootstrap layer from scratch" },
+      { value: "install", label: "Install", hint: "install the bootstrap layer into this tenant's vcluster" },
       { value: "status", label: "Status", hint: "check cluster health, fix what's missing" },
     ],
   });

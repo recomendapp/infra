@@ -1,13 +1,17 @@
 # infra-cli
 
-Bootstraps and inspects the Recomend Hetzner k3s cluster. Everything the CLI
-does is idempotent — re-running it reconciles rather than recreating.
+Bootstraps and inspects Recomend's tenant cluster. Everything the CLI does
+is idempotent — re-running it reconciles rather than recreating.
+
+It does **not** create a cluster: `./kubeconfig` must already point at the
+recomend vcluster declared in [lxup/platform](https://github.com/lxup/platform)
+(`bun run src/index.ts tenant` there writes it).
 
 ```bash
 cd cli
 bun install
 bun start          # interactive menu
-bun start install  # provision / reconcile the cluster
+bun start install  # install / reconcile the bootstrap layer
 bun start status   # check health, offer fixes
 ```
 
@@ -30,10 +34,10 @@ Steps run in dependency order and stop at the first failure.
 
 | Step | What it does |
 |---|---|
-| 00 | Read `hetzner/cluster_config.yaml` — the single source of truth for the cluster's shape |
-| 01 | Check `hetzner-k3s`, `helm`, `kubectl` and `HCLOUD_TOKEN` |
-| 02 | `hetzner-k3s create` — nodes, k3s, kubeconfig |
-| 03 | Wait for the pool minimums to go Ready |
+| 00 | Check whether ArgoCD is already installed — bootstrap or reconcile |
+| 01 | Check `helm` and `kubectl` |
+| 02 | Verify `./kubeconfig`: present, API answering, and pointing at the **tenant** rather than the host cluster — it refuses otherwise |
+| 03 | Wait for the vcluster's API server to report `/readyz` |
 | 04 | Install External Secrets Operator (Helm) |
 | 05 | Create the `infisical-auth` Secret |
 | 06 | Apply the `infisical` ClusterSecretStore |
@@ -51,5 +55,5 @@ to private, ArgoCD needs that credential to clone the repo at all — so ArgoCD
 cannot be what deploys the operator that resolves it. A root of trust cannot
 bootstrap itself from something that depends on it.
 
-Everything downstream of step 09 is GitOps: cert-manager, external-dns, the
-GHCR pull secret, monitoring, the runners, and every app.
+Everything downstream of step 09 is GitOps: Traefik, cloudflared,
+external-dns, the GHCR pull secret, and every app.

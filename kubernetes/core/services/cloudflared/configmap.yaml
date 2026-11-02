@@ -1,0 +1,45 @@
+# La table de routage du tunnel, dans git plutôt que dans le dashboard.
+#
+# Tous les hostnames atterrissent sur le même Traefik interne, qui route
+# ensuite sur le Host header exactement comme quand ce cluster avait une IP
+# publique. Ajouter un hostname = une entrée ici plus un Ingress.
+#
+# http, pas https. Un tunnel veut dire que Cloudflare termine le TLS à son
+# edge quoi que parle l'origine, donc un certificat sur Traefik ne chiffrerait
+# que ce saut, qui ne quitte jamais le réseau de pods du cluster. C'est pour
+# ça qu'il n'y a pas de cert-manager ici.
+#
+# `tunnel:` doit correspondre au TunnelID contenu dans CLOUDFLARE_TUNNEL_TOKEN.
+# C'est un identifiant, pas un secret — il apparaît aussi dans la cible
+# external-dns de chaque Ingress, puisque c'est là que pointent les CNAME.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudflared-config
+data:
+  config.yaml: |
+    tunnel: eaa1365e-4fbc-4be3-b071-595fc95e7506
+    credentials-file: /etc/cloudflared/creds/credentials.json
+    metrics: 0.0.0.0:2000
+    no-autoupdate: true
+
+    ingress:
+      - hostname: recomend.app
+        service: http://traefik.traefik.svc.cluster.local:80
+      - hostname: www.recomend.app
+        service: http://traefik.traefik.svc.cluster.local:80
+      - hostname: api.recomend.app
+        service: http://traefik.traefik.svc.cluster.local:80
+      - hostname: medias.recomend.app
+        service: http://traefik.traefik.svc.cluster.local:80
+      - hostname: analytics.recomend.app
+        service: http://traefik.traefik.svc.cluster.local:80
+      - hostname: martin.recomend.app
+        service: http://traefik.traefik.svc.cluster.local:80
+      - hostname: argocd.recomend.app
+        service: http://traefik.traefik.svc.cluster.local:80
+      - hostname: prefect.recomend.app
+        service: http://traefik.traefik.svc.cluster.local:80
+      # Règle terminale obligatoire : cloudflared refuse une config dont la
+      # dernière entrée porte un hostname.
+      - service: http_status:404

@@ -13,7 +13,7 @@ const CRDS = [
 ];
 
 /**
- * Doc: ESO stays imperative, unlike cert-manager and external-dns which ArgoCD
+ * Doc: ESO stays imperative, unlike Traefik, cloudflared and external-dns which ArgoCD
  * owns. It is the root of trust for every Secret in the cluster, including the
  * repository credentials ArgoCD needs to read this repo at all should it ever
  * go private - so ArgoCD cannot be the thing that installs it without a
