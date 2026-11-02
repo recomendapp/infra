@@ -12,6 +12,7 @@ spec:
       labels:
         app: umami
     spec:
+      enableServiceLinks: false
       containers:
       - name: umami
         image: ghcr.io/umami-software/umami:postgresql-latest

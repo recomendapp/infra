@@ -12,6 +12,7 @@ spec:
   backoffLimit: 0
   template:
     spec:
+      enableServiceLinks: false
       containers:
       - name: rc
         image: rustfs/rc@sha256:ab024bfebee49a750ce886b4c70963ccd9ddaa03f491704a90710641d7a26699

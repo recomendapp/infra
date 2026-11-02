@@ -1,0 +1,37 @@
+# Traefik n'était pas dans ce repo : k3s le fournissait en addon, et
+# core/services/traefik-patch ne faisait qu'ajuster l'addon en place. Un
+# vcluster ne fournit rien, donc il faut le déclarer.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+helmCharts:
+  - name: traefik
+    repo: https://traefik.github.io/charts
+    version: 41.6.1
+    releaseName: traefik
+    namespace: traefik
+    valuesInline:
+      # service.spec.type, pas service.type — le chart passe `service.spec`
+      # tel quel au Service et ignore le reste, donc la version courte est
+      # acceptée et ne fait rien. Vérifié en rendant le chart.
+      #
+      # ClusterIP parce que cloudflared tourne à côté et sort vers Cloudflare :
+      # rien n'a besoin d'être joignable depuis l'extérieur, et aucune adresse
+      # n'est prise dans le pool Cilium de la plateforme.
+      service:
+        spec:
+          type: ClusterIP
+
+      providers:
+        kubernetesIngress:
+          # Un Service ClusterIP n'a pas de status.loadBalancer.ingress à
+          # recopier, donc publishedService laisse chaque Ingress avec un
+          # status vide — et ArgoCD lit ça comme Progressing indéfiniment.
+          publishedService:
+            enabled: false
+          ingressEndpoint:
+            hostname: traefik.traefik.svc.cluster.local
+
+      ingressClass:
+        enabled: true
+        isDefaultClass: true

@@ -1,22 +1,25 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: actions-runner-scale-set-android
+  name: traefik
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "16"
+    # Avant tout le reste : chaque Ingress du cluster référence
+    # ingressClassName: traefik, et l'IngressClass vient de ce chart.
+    argocd.argoproj.io/sync-wave: "5"
 spec:
   project: default
   source:
     repoURL: https://github.com/recomendapp/infra.git
-    targetRevision: main
-    path: kubernetes/core/services/actions-runner-scale-set-android
+    targetRevision: vcluster
+    path: kubernetes/core/services/traefik
   destination:
     server: https://kubernetes.default.svc
-    namespace: arc-runners
+    namespace: traefik
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true

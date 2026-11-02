@@ -2,15 +2,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: web-app-ingress
-  annotations:
-    kubernetes.io/ingress.class: traefik
-    cert-manager.io/cluster-issuer: letsencrypt-production
 spec:
-  tls:
-    - hosts:
-        - recomend.app
-        - www.recomend.app
-      secretName: web-app-tls
+  ingressClassName: traefik
   rules:
     - host: recomend.app
       http:

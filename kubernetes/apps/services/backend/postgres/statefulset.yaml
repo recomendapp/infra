@@ -15,6 +15,7 @@ spec:
       labels:
         app: postgres
     spec:
+      enableServiceLinks: false
       imagePullSecrets:
         - name: github-credentials
       containers:
@@ -53,12 +54,13 @@ spec:
   - metadata:
       name: postgres-data
       annotations:
-        resize.topolvm.io/storage_limit: "50Gi"
-        resize.topolvm.io/threshold: "20%"
-        resize.topolvm.io/increase: "25%"
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: hcloud-volumes
+      storageClassName: longhorn
       resources:
         requests:
-          storage: 20Gi
+          # 27,7 Gi réellement utilisés (mesuré via kubelet_volume_stats).
+          # Les 20Gi déclarés datent d'avant que pvc-autoresizer ne pousse
+          # le volume Hetzner à 50Gi ; sans autoresizer chez nous, il faut
+          # déclarer la taille réelle. Longhorn réplique x2 : 100 Gi d'array.
+          storage: 50Gi

@@ -13,6 +13,7 @@ spec:
       labels:
         app: web-app
     spec:
+      enableServiceLinks: false
       imagePullSecrets:
         - name: github-credentials
       containers:

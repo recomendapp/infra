@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/recomendapp/infra.git
-    targetRevision: main
+    targetRevision: vcluster
     path: kubernetes/apps/services/web-app
   destination:
     server: https://kubernetes.default.svc

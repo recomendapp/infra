@@ -12,6 +12,7 @@ spec:
       labels:
         app: martin
     spec:
+      enableServiceLinks: false
       imagePullSecrets:
         - name: github-credentials
       containers:

@@ -9,6 +9,7 @@ metadata:
 spec:
   template:
     spec:
+      enableServiceLinks: false
       imagePullSecrets:
         - name: github-credentials
       containers:

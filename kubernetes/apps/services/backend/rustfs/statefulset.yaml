@@ -13,7 +13,8 @@ spec:
       labels:
         app: rustfs
     spec:
-      # The image runs as uid/gid 10001 but the hcloud volume mounts root-owned:
+      enableServiceLinks: false
+      # The image runs as uid/gid 10001 but the volume mounts root-owned:
       # without fsGroup, `mkdir /data/rustfs0` fails and the pod crash-loops.
       securityContext:
         runAsUser: 10001
@@ -63,12 +64,9 @@ spec:
   - metadata:
       name: rustfs-data
       annotations:
-        resize.topolvm.io/storage_limit: "100Gi"
-        resize.topolvm.io/threshold: "20%"
-        resize.topolvm.io/increase: "25%"
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: hcloud-volumes
+      storageClassName: longhorn
       resources:
         requests:
           storage: 20Gi

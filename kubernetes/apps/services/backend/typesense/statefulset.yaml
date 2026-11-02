@@ -13,6 +13,7 @@ spec:
       labels:
         app: typesense
     spec:
+      enableServiceLinks: false
       containers:
       - name: typesense
         image: typesense/typesense:29.0
@@ -44,12 +45,9 @@ spec:
   - metadata:
       name: data
       annotations:
-        resize.topolvm.io/storage_limit: "20Gi"
-        resize.topolvm.io/threshold: "20%"
-        resize.topolvm.io/increase: "25%"
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: hcloud-volumes
+      storageClassName: longhorn
       resources:
         requests:
           storage: 10Gi
