@@ -24,10 +24,6 @@ is deliberately not GitOps.
 ```
 bootstrap/     one-shot manifests and Helm values for the bootstrap layer
                (ArgoCD, External Secrets Operator, the infisical store)
-hetzner/       the Hetzner cluster's config. DO NOT run `hetzner-k3s delete`:
-               those VPS are on grandfathered pricing that no longer exists,
-               so the cluster stays up as a warm rollback target and is only
-               retired on an explicit decision, not as a migration step
 kubernetes/
   core/        the cluster's own infra: ArgoCD config, Traefik, cloudflared,
                external-dns, the GHCR pull secret

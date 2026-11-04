@@ -17,20 +17,26 @@ sources:
 extraArgs:
   # A cfargotunnel.com CNAME is only reachable proxied.
   - --cloudflare-proxied
-  # A is listed only while the old cluster's A records still stand:
-  # Cloudflare refuses a CNAME on a name that already has an A. Remove it
-  # once they are gone.
+  # A is listed only because Cloudflare refuses a CNAME on a name that
+  # already carries an A record, and the pre-migration A records pointed at
+  # the old cluster's load balancer.
+  #
+  # TODO: drop this flag once the zone holds no leftover A records for any
+  # name this external-dns manages. Do NOT drop it on the assumption that
+  # they are gone: if one remains, external-dns stops managing it and
+  # Cloudflare keeps serving a dead address forever. Check the zone first.
   - --managed-record-types=A
   - --managed-record-types=CNAME
   - --managed-record-types=TXT
 
 policy: sync
 registry: txt
-# SAME owner as the Hetzner cluster's external-dns, deliberately: with a
-# different txtOwnerId this one would treat the existing records as somebody
-# else's and, under policy sync, leave them alone — the CNAMEs would never be
-# created. Only safe because that cluster is powered off; both running would
-# fight every minute.
+# DO NOT CHANGE THIS VALUE. It is the owner id the TXT registry already
+# carries for every record in the zone, inherited from the cluster this one
+# replaced. Under `policy: sync` a different txtOwnerId would make this
+# instance treat all existing records as somebody else's and refuse to touch
+# them: the CNAMEs stop being reconciled and production DNS drifts. It looks
+# like a leftover. It is load-bearing.
 txtOwnerId: "k8s"
 interval: "1m"
 

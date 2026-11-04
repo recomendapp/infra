@@ -1,9 +1,8 @@
-# Comment ce tenant est joignable depuis internet.
+# How this tenant is reachable from the internet.
 #
-# Sur Hetzner le nœud avait une IP publique et le servicelb de k3s prenait
-# 80/443 dessus. À la maison il y a un seul port-forward sur l'UDM Pro, et il
-# appartient au Traefik du tenant homelab : il n'y a simplement pas de chemin
-# inbound path available at home, so the tunnel is the only option.
+# There is exactly one port-forward on the UDM Pro and it belongs to the
+# homelab tenant's Traefik, so this tenant has no inbound path at all. An
+# outbound tunnel is not a preference here, it is the only option.
 #
 # Two replicas: cloudflared holds long-lived outbound connections, and one pod
 # being rescheduled alone would drop every request in flight.

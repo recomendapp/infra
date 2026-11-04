@@ -11,8 +11,8 @@ export const repoRoot = path.resolve(here, "..", "..", "..");
  *
  * This repo does not know how its cluster is produced and holds no
  * credentials for the machine underneath. The cluster is a vcluster declared
- * in lxup/platform, and this file is the only thing crossing that boundary —
- * which is what replaced `hetzner-k3s create`.
+ * in lxup/platform, and this file is the only thing crossing that boundary:
+ * the platform creates the cluster, this repo only consumes it.
  *
  * Produce it with `platform tenant` in that repo, which writes
  * tenants/recomend.kubeconfig, and copy it here. Gitignored: it is a live
