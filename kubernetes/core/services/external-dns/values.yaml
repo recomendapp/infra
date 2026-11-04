@@ -17,15 +17,17 @@ sources:
 extraArgs:
   # A cfargotunnel.com CNAME is only reachable proxied.
   - --cloudflare-proxied
-  # A is listed only because Cloudflare refuses a CNAME on a name that
-  # already carries an A record, and the pre-migration A records pointed at
-  # the old cluster's load balancer.
+  # CNAME and TXT only — A is deliberately absent. Every name this manages is
+  # a proxied CNAME to the cloudflared tunnel, so there is no case where
+  # external-dns needs to write an A record. A used to be listed because
+  # Cloudflare refuses a CNAME on a name that already carries an A, and the
+  # pre-cutover A records pointed at a load balancer that no longer exists.
+  # The zone was checked on 2026-11-04 and holds none.
   #
-  # TODO: drop this flag once the zone holds no leftover A records for any
-  # name this external-dns manages. Do NOT drop it on the assumption that
-  # they are gone: if one remains, external-dns stops managing it and
-  # Cloudflare keeps serving a dead address forever. Check the zone first.
-  - --managed-record-types=A
+  # Note for whoever checks this again: `dig A <name>` cannot answer the
+  # question. A proxied CNAME always resolves to Cloudflare's anycast
+  # addresses, so an A query returns A answers either way. Read the record
+  # list in the dashboard or via the API.
   - --managed-record-types=CNAME
   - --managed-record-types=TXT
 
