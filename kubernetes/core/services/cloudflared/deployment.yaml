@@ -1,0 +1,73 @@
+# How this tenant is reachable from the internet.
+#
+# There is exactly one port-forward on the UDM Pro and it belongs to the
+# homelab tenant's Traefik, so this tenant has no inbound path at all. An
+# outbound tunnel is not a preference here, it is the only option.
+#
+# Two replicas: cloudflared holds long-lived outbound connections, and one pod
+# being rescheduled alone would drop every request in flight.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflared
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cloudflared
+  template:
+    metadata:
+      labels:
+        app: cloudflared
+    spec:
+      enableServiceLinks: false
+      containers:
+        - name: cloudflared
+          image: cloudflare/cloudflared:2026.10.7
+          args:
+            - tunnel
+            # --config, pas --token : la forme token fait chercher le routage
+            # chez Cloudflare et ignorer configmap.yaml. --no-autoupdate est
+            # dans le fichier de config.
+            - --config
+            - /etc/cloudflared/config.yaml
+            - run
+          volumeMounts:
+            - name: config
+              mountPath: /etc/cloudflared
+              readOnly: true
+            - name: creds
+              mountPath: /etc/cloudflared/creds
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /ready
+              port: 2000
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 2000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 20m
+              memory: 48Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 65532
+            capabilities:
+              drop: ["ALL"]
+      volumes:
+        - name: config
+          configMap:
+            name: cloudflared-config
+        - name: creds
+          secret:
+            secretName: cloudflared-credentials

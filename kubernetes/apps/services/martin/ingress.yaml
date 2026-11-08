@@ -3,13 +3,9 @@ kind: Ingress
 metadata:
   name: martin
   annotations:
-    kubernetes.io/ingress.class: traefik
-    cert-manager.io/cluster-issuer: letsencrypt-production
+    external-dns.kubernetes.io/target: eaa1365e-4fbc-4be3-b071-595fc95e7506.cfargotunnel.com
 spec:
-  tls:
-    - hosts:
-        - martin.recomend.app
-      secretName: martin-tls
+  ingressClassName: traefik
   rules:
     - host: martin.recomend.app
       http:

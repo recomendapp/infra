@@ -1,3 +1,0 @@
-resources:
-  - service-patch.yaml
-  - helmchartconfig.yaml

@@ -14,11 +14,12 @@ spec:
       labels:
         app: notify
     spec:
+      enableServiceLinks: false
       imagePullSecrets:
         - name: github-credentials
       containers:
         - name: notify
-          image: ghcr.io/recomendapp/notify:b136-0764835
+          image: ghcr.io/recomendapp/notify:b134-c56ce7b
           imagePullPolicy: Always
           ports:
             - containerPort: 9001

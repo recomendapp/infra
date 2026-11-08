@@ -13,6 +13,7 @@ spec:
       labels:
         app: umami-postgres
     spec:
+      enableServiceLinks: false
       containers:
       - name: postgres
         image: postgres:16-alpine
@@ -55,12 +56,9 @@ spec:
   - metadata:
       name: data
       annotations:
-        resize.topolvm.io/storage_limit: "20Gi"
-        resize.topolvm.io/threshold: "20%"
-        resize.topolvm.io/increase: "25%"
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: hcloud-volumes
+      storageClassName: longhorn
       resources:
         requests:
-          storage: 10Gi
+          storage: 20Gi

@@ -2,7 +2,7 @@
   "name": "@recomendapp/infra-cli",
   "version": "0.1.0",
   "private": true,
-  "description": "Interactive CLI to bootstrap and manage the Recomend Hetzner k3s + ArgoCD cluster",
+  "description": "Interactive CLI to bootstrap and manage the Recomend vcluster + ArgoCD",
   "type": "module",
   "bin": {
     "recomend-infra": "./bin/recomend-infra.js"

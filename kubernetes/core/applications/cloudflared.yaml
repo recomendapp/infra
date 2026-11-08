@@ -1,22 +1,25 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: actions-runner-scale-set-android
+  name: cloudflared
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "16"
+    # After Traefik (5), which it proxies to. Before external-dns: a CNAME to
+    # a tunnel that is not up yet resolves to nothing, and Cloudflare caches it.
+    argocd.argoproj.io/sync-wave: "6"
 spec:
   project: default
   source:
     repoURL: https://github.com/recomendapp/infra.git
     targetRevision: main
-    path: kubernetes/core/services/actions-runner-scale-set-android
+    path: kubernetes/core/services/cloudflared
   destination:
     server: https://kubernetes.default.svc
-    namespace: arc-runners
+    namespace: cloudflared
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true

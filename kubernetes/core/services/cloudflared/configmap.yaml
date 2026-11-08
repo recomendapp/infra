@@ -1,0 +1,38 @@
+# The tunnel's routing table. Adding a hostname is one entry here plus an
+# Ingress.
+#
+# http, not https: a tunnel means Cloudflare terminates TLS at its edge
+# whatever the origin speaks, so a certificate on Traefik would only encrypt
+# this hop, which never leaves the pod network. Hence no cert-manager here.
+#
+# `tunnel:` must match the TunnelID inside CLOUDFLARE_TUNNEL_TOKEN.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudflared-config
+data:
+  config.yaml: |
+    tunnel: eaa1365e-4fbc-4be3-b071-595fc95e7506
+    credentials-file: /etc/cloudflared/creds/credentials.json
+    metrics: 0.0.0.0:2000
+    no-autoupdate: true
+
+    ingress:
+      - hostname: recomend.app
+        service: http://traefik.traefik.svc.cluster.local:80
+      - hostname: www.recomend.app
+        service: http://traefik.traefik.svc.cluster.local:80
+      - hostname: api.recomend.app
+        service: http://traefik.traefik.svc.cluster.local:80
+      - hostname: medias.recomend.app
+        service: http://traefik.traefik.svc.cluster.local:80
+      - hostname: analytics.recomend.app
+        service: http://traefik.traefik.svc.cluster.local:80
+      - hostname: martin.recomend.app
+        service: http://traefik.traefik.svc.cluster.local:80
+      - hostname: argocd.recomend.app
+        service: http://traefik.traefik.svc.cluster.local:80
+      - hostname: prefect.recomend.app
+        service: http://traefik.traefik.svc.cluster.local:80
+      # Required: cloudflared refuses a config whose last entry has a hostname.
+      - service: http_status:404

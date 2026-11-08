@@ -18,6 +18,7 @@ spec:
       backoffLimit: 1
       template:
         spec:
+          enableServiceLinks: false
           restartPolicy: Never
           containers:
             - name: prune

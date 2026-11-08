@@ -3,15 +3,9 @@ kind: Ingress
 metadata:
   name: rustfs
   annotations:
-    kubernetes.io/ingress.class: traefik
-    cert-manager.io/cluster-issuer: letsencrypt-production
+    external-dns.kubernetes.io/target: eaa1365e-4fbc-4be3-b071-595fc95e7506.cfargotunnel.com
 spec:
-  tls:
-    - hosts:
-        - medias.recomend.app
-      # Inherited from the MinIO ingress: the cert-manager Secret outlives the
-      # old Ingress, so reusing its name avoids a reissue (and a TLS gap).
-      secretName: minio-tls
+  ingressClassName: traefik
   rules:
     - host: medias.recomend.app
       http:

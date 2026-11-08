@@ -7,8 +7,8 @@
 # (battle-tested, actively maintained) instead of hand-rolled sdkmanager calls.
 # Pin bumped from https://github.com/react-native-community/docker-android/releases
 #
-# Assumes amd64 k3s nodes (standard Hetzner instances). If your nodes are ARM
-# (Hetzner CAX), swap "x64"/"linux-x64" for "aarch64"/"linux-arm64" below.
+# Assumes amd64 nodes. On ARM nodes, swap "x64"/"linux-x64" for
+# "aarch64"/"linux-arm64" below.
 
 FROM reactnativecommunity/react-native-android:v21.0 AS android-tools
 

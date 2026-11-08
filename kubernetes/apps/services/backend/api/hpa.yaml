@@ -2,6 +2,12 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: api
+  annotations:
+    # After the Deployment it targets (wave 3). At wave 0 the controller
+    # reports `deployments.apps "api" not found`, ArgoCD reads the HPA as
+    # unhealthy and never leaves wave 0, so nothing in backend deploys. Only
+    # reproducible on an empty cluster.
+    argocd.argoproj.io/sync-wave: "4"
 spec:
   scaleTargetRef:
     apiVersion: apps/v1

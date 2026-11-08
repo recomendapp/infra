@@ -1,20 +1,25 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: traefik-patch
+  name: traefik
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "45"
+    # Before everything: every Ingress names ingressClassName: traefik, and
+    # the IngressClass comes from this chart.
+    argocd.argoproj.io/sync-wave: "5"
 spec:
   project: default
   source:
     repoURL: https://github.com/recomendapp/infra.git
     targetRevision: main
-    path: kubernetes/core/services/traefik-patch
+    path: kubernetes/core/services/traefik
   destination:
     server: https://kubernetes.default.svc
-    namespace: kube-system
+    namespace: traefik
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

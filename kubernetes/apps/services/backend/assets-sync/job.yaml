@@ -8,11 +8,12 @@ metadata:
 spec:
   template:
     spec:
+      enableServiceLinks: false
       imagePullSecrets:
         - name: github-credentials
       containers:
         - name: assets-sync
-          image: ghcr.io/recomendapp/assets:b136-0764835
+          image: ghcr.io/recomendapp/assets:b124-00f6a3a
           imagePullPolicy: Always
           envFrom:
             - secretRef:

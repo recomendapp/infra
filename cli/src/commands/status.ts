@@ -3,7 +3,6 @@ import pc from "picocolors";
 import {
   getArgoApplication,
   getDeploymentReady,
-  getNodesStatus,
   helmReleaseExists,
   refreshArgoApplication,
 } from "../lib/kubectl.js";
@@ -24,26 +23,6 @@ interface CheckResult {
   fix?: { label: string; run: () => Promise<void> };
 }
 
-async function checkNodes(): Promise<CheckResult> {
-  const nodes = await getNodesStatus();
-  if (!nodes) {
-    return {
-      key: "nodes",
-      label: "Cluster nodes",
-      health: "missing",
-      detail: "no kubeconfig / cluster unreachable",
-    };
-  }
-  const health: Health = nodes.ready === nodes.total ? "ok" : "degraded";
-  return {
-    key: "nodes",
-    label: "Cluster nodes",
-    health,
-    detail: `${nodes.ready}/${nodes.total} Ready`,
-  };
-}
-
-/** ESO is bootstrap-layer, so it is a Helm release here rather than an ArgoCD Application. */
 async function checkExternalSecrets(): Promise<CheckResult> {
   const installed = await helmReleaseExists("external-secrets", "external-secrets");
   if (!installed) {
@@ -137,22 +116,14 @@ function argoAppCheck(key: string, label: string) {
 }
 
 const CHECKS = [
-  checkNodes,
   checkExternalSecrets,
   checkArgocd,
   checkRootApp,
   // kubernetes/core
-  argoAppCheck("cert-manager", "cert-manager"),
-  argoAppCheck("cluster-issuers", "Cluster issuers"),
-  argoAppCheck("external-dns", "external-dns"),
+  argoAppCheck("argocd-config", "ArgoCD Ingress + webhook"),
+  argoAppCheck("traefik", "Traefik"),
+  argoAppCheck("cloudflared", "Cloudflare tunnel"),
   argoAppCheck("ghcr-pull-secret", "GHCR pull secret"),
-  argoAppCheck("argocd-config", "ArgoCD config"),
-  argoAppCheck("traefik-patch", "Traefik patch"),
-  argoAppCheck("hcloud-volumes-patch", "hcloud volumes patch"),
-  argoAppCheck("monitoring", "Monitoring"),
-  argoAppCheck("pvc-autoresizer", "PVC autoresizer"),
-  argoAppCheck("actions-runner-controller", "ARC controller"),
-  argoAppCheck("actions-runner-scale-set-android", "ARC android runners"),
   // kubernetes/apps
   argoAppCheck("root-apps", "Apps app-of-apps"),
   argoAppCheck("backend", "Backend"),

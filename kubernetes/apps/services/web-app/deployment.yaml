@@ -13,11 +13,12 @@ spec:
       labels:
         app: web-app
     spec:
+      enableServiceLinks: false
       imagePullSecrets:
         - name: github-credentials
       containers:
         - name: web-app
-          image: ghcr.io/recomendapp/web:b136-0764835
+          image: ghcr.io/recomendapp/web:b134-c56ce7b
           imagePullPolicy: Always
           ports:
             - containerPort: 3000

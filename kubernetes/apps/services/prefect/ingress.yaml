@@ -4,13 +4,9 @@ metadata:
   name: prefect
   namespace: prefect
   annotations:
-    kubernetes.io/ingress.class: traefik
-    cert-manager.io/cluster-issuer: letsencrypt-production
+    external-dns.kubernetes.io/target: eaa1365e-4fbc-4be3-b071-595fc95e7506.cfargotunnel.com
 spec:
-  tls:
-    - hosts:
-        - prefect.recomend.app
-      secretName: prefect-tls
+  ingressClassName: traefik
   rules:
     - host: prefect.recomend.app
       http:

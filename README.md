@@ -1,7 +1,16 @@
 # infra
 
-GitOps for Recomend: a Hetzner k3s cluster, ArgoCD watching this repo, and
-everything else deployed as ArgoCD `Application`s from `kubernetes/`.
+GitOps for Recomend: ArgoCD watching this repo, and everything else deployed
+as ArgoCD `Application`s from `kubernetes/`.
+
+This repo does not create its cluster. It runs as a tenant in a virtual
+cluster declared in [lxup/platform](https://github.com/lxup/platform), and the
+only thing crossing that boundary is a kubeconfig — see `cli/src/lib/paths.ts`.
+
+Reachable from the internet through a Cloudflare tunnel, not an inbound port:
+the cluster has no public address of its own. See
+`kubernetes/core/services/cloudflared/secret.yaml` for the one piece of setup
+that lives in Cloudflare's dashboard rather than here.
 
 ```bash
 cd cli && bun install && bun start
@@ -15,14 +24,15 @@ is deliberately not GitOps.
 ```
 bootstrap/     one-shot manifests and Helm values for the bootstrap layer
                (ArgoCD, External Secrets Operator, the infisical store)
-hetzner/       hetzner-k3s cluster config - the shape of the cluster
 kubernetes/
-  core/        the cluster's own infra: cert-manager, external-dns, ArgoCD
-               config, Traefik and hcloud patches, monitoring, CI runners,
-               the GHCR pull secret
+  core/        the cluster's own infra: ArgoCD config, Traefik, cloudflared,
+               external-dns, the GHCR pull secret
   apps/        the Recomend services: backend, web-app, umami, martin, prefect
 cli/           the bootstrap/status CLI
-runner-images/ Dockerfile for the self-hosted Android CI runner
+runner-images/ Dockerfile for the self-hosted Android CI runner - kept, but
+               no longer deployed: one runner asks for 12 Gi and 6 CPU and the
+               platform's nodes have 14.7 Gi each, so CI runs on GitHub-hosted
+               runners for now
 ```
 
 `core` and `apps` are each their own ArgoCD app-of-apps (`core/root.yaml`, and

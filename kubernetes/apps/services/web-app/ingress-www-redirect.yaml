@@ -3,11 +3,12 @@ kind: Ingress
 metadata:
   name: web-app-www-redirect-ingress
   annotations:
-    kubernetes.io/ingress.class: traefik
+    external-dns.kubernetes.io/target: eaa1365e-4fbc-4be3-b071-595fc95e7506.cfargotunnel.com
     traefik.ingress.kubernetes.io/redirect-regex: "^https?://(?:www\\.)?recomend.app/(.*)"
     traefik.ingress.kubernetes.io/redirect-replacement: "https://recomend.app/$1"
     traefik.ingress.kubernetes.io/redirect-permanent: "true"
 spec:
+  ingressClassName: traefik
   rules:
     - host: www.recomend.app
       http:

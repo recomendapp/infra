@@ -1,3 +1,7 @@
+# CNAME, not A: traffic arrives through the Cloudflare tunnel, and each
+# Ingress names it in an `external-dns.kubernetes.io/target` annotation. Note
+# the prefix: NOT `external-dns.alpha.kubernetes.io/`, which v0.23 no longer
+# reads by default and ignores silently.
 provider: cloudflare
 
 env:
@@ -11,13 +15,30 @@ sources:
   - ingress
 
 extraArgs:
+  # A cfargotunnel.com CNAME is only reachable proxied.
   - --cloudflare-proxied
-  - --managed-record-types=A
-  - --exclude-target-net=10.0.0.0/8
-  - --exclude-target-net=fd00::/8
+  # CNAME and TXT only — A is deliberately absent. Every name this manages is
+  # a proxied CNAME to the cloudflared tunnel, so there is no case where
+  # external-dns needs to write an A record. A used to be listed because
+  # Cloudflare refuses a CNAME on a name that already carries an A, and the
+  # pre-cutover A records pointed at a load balancer that no longer exists.
+  # The zone was checked on 2026-11-04 and holds none.
+  #
+  # Note for whoever checks this again: `dig A <name>` cannot answer the
+  # question. A proxied CNAME always resolves to Cloudflare's anycast
+  # addresses, so an A query returns A answers either way. Read the record
+  # list in the dashboard or via the API.
+  - --managed-record-types=CNAME
+  - --managed-record-types=TXT
 
 policy: sync
 registry: txt
+# DO NOT CHANGE THIS VALUE. It is the owner id the TXT registry already
+# carries for every record in the zone, inherited from the cluster this one
+# replaced. Under `policy: sync` a different txtOwnerId would make this
+# instance treat all existing records as somebody else's and refuse to touch
+# them: the CNAMEs stop being reconciled and production DNS drifts. It looks
+# like a leftover. It is load-bearing.
 txtOwnerId: "k8s"
 interval: "1m"
 

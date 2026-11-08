@@ -14,11 +14,12 @@ spec:
       labels:
         app: worker
     spec:
+      enableServiceLinks: false
       imagePullSecrets:
         - name: github-credentials
       containers:
         - name: worker
-          image: ghcr.io/recomendapp/worker:b136-0764835
+          image: ghcr.io/recomendapp/worker:b134-c56ce7b
           imagePullPolicy: Always
           ports:
             - containerPort: 9002

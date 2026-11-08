@@ -1,0 +1,30 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+helmCharts:
+  - name: traefik
+    repo: https://traefik.github.io/charts
+    version: 41.6.1
+    releaseName: traefik
+    namespace: traefik
+    valuesInline:
+      # service.spec.type, not service.type: the chart passes `service.spec`
+      # straight through and ignores anything else, so the short spelling is
+      # accepted and silently does nothing.
+      service:
+        spec:
+          type: ClusterIP
+
+      providers:
+        kubernetesIngress:
+          # A ClusterIP Service has no status.loadBalancer.ingress to copy,
+          # so publishedService leaves every Ingress with an empty status,
+          # which ArgoCD reads as Progressing forever.
+          publishedService:
+            enabled: false
+          ingressEndpoint:
+            hostname: traefik.traefik.svc.cluster.local
+
+      ingressClass:
+        enabled: true
+        isDefaultClass: true

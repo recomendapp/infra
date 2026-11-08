@@ -13,11 +13,16 @@ spec:
       labels:
         app: api
     spec:
+      # A vcluster injects the virtual cluster's service links as explicit
+      # `env:` entries, and `env:` outranks `envFrom:`. With Services named
+      # `redis` and `typesense` that shadows REDIS_PORT and TYPESENSE_PORT
+      # with `tcp://10.x.x.x:6379`. On plain Kubernetes they lose to both.
+      enableServiceLinks: false
       imagePullSecrets:
         - name: github-credentials
       containers:
         - name: api
-          image: ghcr.io/recomendapp/api:b136-0764835
+          image: ghcr.io/recomendapp/api:b134-c56ce7b
           imagePullPolicy: Always
           ports:
             - containerPort: 9000

@@ -46,12 +46,12 @@ spec:
                   memory: "2Gi"
               persistence:
                 enabled: true
-                storageClass: hcloud-volumes
-                size: 10Gi
+                storageClass: longhorn
+                # C'est presque tout de l'historique de flow runs, et le
+                # CronJob history-prune ne suit visiblement pas. À purger
+                # avant la copie, ce qui permettrait de redescendre ici.
+                size: 50Gi
                 annotations:
-                  resize.topolvm.io/storage_limit: "50Gi"
-                  resize.topolvm.io/threshold: "20%"
-                  resize.topolvm.io/increase: "25%"
 
     - repoURL: https://prefecthq.github.io/prefect-helm
       chart: prefect-worker
