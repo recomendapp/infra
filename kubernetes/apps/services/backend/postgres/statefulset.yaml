@@ -52,6 +52,26 @@ spec:
         volumeMounts:
           - name: postgres-data
             mountPath: /var/lib/postgresql/data
+          # Postgres allocates POSIX shared memory here to pass tuples
+          # between a parallel query's leader and its workers. A container's
+          # /dev/shm defaults to 64Mi, which is not enough: the allocation
+          # fails outright rather than degrading, and takes the query with it.
+          #
+          #   ERROR: could not resize shared memory segment to 16777216 bytes:
+          #          No space left on device
+          #   FATAL: terminating background worker "parallel worker"
+          #
+          # `refresh materialized view tmdb.person_feed_view` hit this every
+          # day at 16:01 UTC and had not succeeded since 2026-11-02 — the view
+          # was serving fourteen-day-old rows. Nothing surfaced it: the failure
+          # is inside Postgres, so no pod restarted and no alert fired.
+          #
+          # This is the sequel to the work_mem tuning in args above. Raising it
+          # to 32MB stopped the 2.7GB spill to disk and made the refresh cheap
+          # enough that the planner started parallelising it, which is what
+          # brought it to this ceiling.
+          - name: dshm
+            mountPath: /dev/shm
         resources:
           requests:
             memory: "3584Mi"
@@ -69,6 +89,15 @@ spec:
             command: ["sh", "-c", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
           initialDelaySeconds: 5
           periodSeconds: 5
+      volumes:
+        # Memory-backed, so it counts against the container's 6Gi limit — but
+        # only for what is actually written. Postgres sits at ~1.2Gi today, so
+        # the worst case lands near 2.3Gi. 1Gi is the usual figure for Postgres
+        # in Kubernetes; the allocation that failed here was 16Mi.
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
   volumeClaimTemplates:
   - metadata:
       name: postgres-data
