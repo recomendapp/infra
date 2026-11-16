@@ -7,7 +7,17 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: web-app
-  minReplicas: 1
+  # 2, not 1: the heap leak documented under `metrics` below now reaches the
+  # 4Gi limit instead of plateauing under it. Measured on 2026-11-16 at
+  # 66 Mi/hour with no plateau, which is ~36h from a fresh pod to OOMKilled —
+  # one happened on 2026-11-15 at 19:05. At one replica that kill IS an
+  # outage; at two the survivor serves while the other restarts.
+  #
+  # This buys time, it does not fix anything. The leak is in the image
+  # (ghcr.io/recomendapp/web) and is being tracked down separately — no
+  # scheduled restart here on purpose, so the OOMKill stays visible as the
+  # signal that it is still unfixed.
+  minReplicas: 2
   maxReplicas: 4
   # scaleUp takes the minimum recommendation over its window, so a spike
   # shorter than 300s never adds a pod - only sustained load does.
