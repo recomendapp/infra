@@ -28,3 +28,25 @@ helmCharts:
       ingressClass:
         enabled: true
         isDefaultClass: true
+
+      # Without this, Traefik rewrites X-Forwarded-Proto from the scheme of the
+      # connection it received. TLS terminates at Cloudflare and cloudflared
+      # then speaks plain HTTP to this Service, so every backend was told the
+      # request arrived over http even when it did not.
+      #
+      # Martin is where that surfaced. It builds the TileJSON `tiles` URL from
+      # the request, so it advertised http://martin.recomend.app/{z}/{x}/{y} to
+      # a page served over HTTPS and the browser blocked every tile as mixed
+      # content. Measured on the live pods: Martin returns https when the header
+      # reaches it, http when it does not, and the header does not survive
+      # Traefik without this setting.
+      #
+      # The whole pod CIDR rather than cloudflared's pod IPs, which change on
+      # every restart. The exposure is that any pod in this vcluster could spoof
+      # X-Forwarded-*; acceptable because the Service is ClusterIP, so nothing
+      # outside the cluster can reach the entrypoint at all.
+      ports:
+        web:
+          forwardedHeaders:
+            trustedIPs:
+              - 10.244.0.0/16
