@@ -20,7 +20,7 @@ spec:
         - name: github-credentials
       containers:
       - name: postgres
-        image: ghcr.io/recomendapp/postgres:b140-b2c9790
+        image: ghcr.io/recomendapp/postgres:b141-e51275c
         # The 4MB work_mem default made REFRESH MATERIALIZED VIEW
         # tmdb.person_feed_view spill a 2.7 GB sort to temp files and take
         # 35 minutes. work_mem stays modest: it applies per sort, per
