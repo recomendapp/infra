@@ -13,7 +13,7 @@ spec:
         - name: github-credentials
       containers:
         - name: assets-sync
-          image: ghcr.io/recomendapp/assets:b141-e51275c
+          image: ghcr.io/recomendapp/assets:b143-67344b7
           imagePullPolicy: Always
           envFrom:
             - secretRef:
